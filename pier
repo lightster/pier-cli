@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+
+require "thor"
+
+class Pier < Thor
+  desc "install GITHUB_REPO", "install GITHUB_REPO"
+  def install(repo)
+    puts "v ssh"
+    puts "cd /codebase"
+    puts "git clone git@github.com:#{repo}.git"
+    puts "./configure pier"
+    puts "make install || npm install"
+  end
+end
+
+Pier.start(ARGV)
