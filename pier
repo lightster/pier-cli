@@ -43,6 +43,46 @@ class Pier < Thor
       end
     end
   end
+
+  desc "test PROJECT_NAME", "run tests for PROJECT"
+  def test(project)
+    project_dir = getProjectDir(project)
+
+    if File.exist?("#{project_dir}/Makefile") then
+      exec("
+        cd '#{project_dir}' \
+          && make test 1>&2
+      ")
+    end
+  end
+
+  private
+
+  def getProjectDir(project)
+    codebase_dir = "/codebase"
+
+    repo_dir = "#{codebase_dir}/#{project}"
+    if Dir.exists?(repo_dir) then
+      return repo_dir
+    end
+
+    repo_pattern = "#{codebase_dir}/*.#{project}"
+    matches = Dir.glob(repo_pattern)
+    if matches.length == 1 then
+      return matches[0]
+    elsif matches.length >= 1
+      STDERR.puts "Multiple projects match the given project name:"
+      matches.each do |path|
+        match = path.sub!("#{codebase_dir}/", '')
+        STDERR.puts " - #{match}"
+      end
+      STDERR.puts "\nPlease use a full qualified project name."
+      exit 1
+    end
+
+    STDERR.puts "No projects match '#{project}'"
+    exit 1
+  end
 end
 
 Pier.start(ARGV)
