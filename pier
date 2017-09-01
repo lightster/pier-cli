@@ -32,14 +32,15 @@ class Pier < Thor
       end
     end
 
-    if File.exist?("#{repo_dir}/make") then
-      configure_output = %x(
-        cd "#{repo_dir}" \
+    if File.exist?("#{repo_dir}/Makefile") then
+      make_output = %x(
+        cd '#{repo_dir}' \
           && make install
       )
 
       if $?.exitstatus != 0 then
-        STDERR.puts "Error while running \`make install\`:\n#{configure_output}"
+        STDERR.puts "Error while running \`make install\`:\n#{make_output}"
+        exit 1
       end
     end
   end
