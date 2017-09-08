@@ -5,6 +5,8 @@ require "thor"
 class Pier < Thor
   desc "install GITHUB_REPO", "install GITHUB_REPO"
   def install(repo)
+    abort "A repo name must be provided" if repo.to_s.empty?
+
     namespaced_repo = repo.sub('/', '.')
 
     codebase_dir = "/codebase"
@@ -84,6 +86,13 @@ class Pier < Thor
     STDERR.puts "No projects match '#{project}'"
     exit 1
   end
+end
+
+if ARGV[0] == "moor" then
+  pier = Pier.new()
+  pier.install(ARGV[1] || "")
+
+  exit 0
 end
 
 Pier.start(ARGV)
