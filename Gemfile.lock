@@ -1,13 +1,11 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    thor (0.20.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  thor (~> 0.20)
 
 BUNDLED WITH
    1.15.4

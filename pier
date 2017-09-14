@@ -1,9 +1,8 @@
 #!/usr/bin/env ruby
 
-require "thor"
+require 'shellwords'
 
-class Pier < Thor
-  desc "install GITHUB_REPO", "install GITHUB_REPO"
+class Pier
   def install(repo)
     abort "A repo name must be provided" if repo.to_s.empty?
 
@@ -47,19 +46,23 @@ class Pier < Thor
     end
   end
 
-  desc "test PROJECT_NAME", "run tests for PROJECT"
-  def test(project)
+  def runProjectCommand(project, commands)
     project_dir = getProjectDir(project)
 
     if File.exist?("#{project_dir}/Makefile") then
+      escaped = commands.map do |command|
+        command.shellescape
+      end
+      full_command = escaped.join " "
+
       exec("
         cd '#{project_dir}' \
-          && make test 1>&2
+          && make #{full_command} 1>&2
       ")
     end
   end
 
-  private
+private
 
   def getProjectDir(project)
     codebase_dir = "/codebase"
@@ -88,11 +91,12 @@ class Pier < Thor
   end
 end
 
+pier = Pier.new()
 if ARGV[0] == "moor" then
-  pier = Pier.new()
   pier.install(ARGV[1] || "")
-
   exit 0
 end
 
-Pier.start(ARGV)
+args = Array.new(ARGV)
+command = args.shift()
+pier.runProjectCommand(command, args)
