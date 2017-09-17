@@ -17,7 +17,7 @@ class Pier
     end
 
     if command == "help" or command.to_s.empty? then
-      projects = getAvailableProjects
+      projects = getAvailableProjects({shortened: true})
       puts <<HELP
 Usage:
   pier COMMAND
@@ -106,7 +106,22 @@ HELP
       end
     end
 
-    return files
+    return files if !options[:shortened]
+
+    project_counts = files.each_with_object(Hash.new(0)) do |fq_project, counts|
+      project = fq_project.rpartition('.')[2]
+
+      counts[project] += 1
+    end
+
+    files.map do |fq_project|
+      project = fq_project.rpartition('.')[2]
+      if project_counts[project] == 1 then
+        project
+      else
+        fq_project
+      end
+    end.sort
   end
 
 private
