@@ -17,6 +17,7 @@ class Pier
     end
 
     if command == "help" or command.to_s.empty? then
+      projects = getAvailableProjects
       puts <<HELP
 Usage:
   pier COMMAND
@@ -25,6 +26,9 @@ Usage:
 Available commands:
   moor       Install a project
   help       Output this help documentation
+
+Available projects:
+  #{projects.join("\n  ")}
 HELP
       exit 0
     end
@@ -89,6 +93,20 @@ HELP
           && make #{full_command} 1>&2
       ")
     end
+  end
+
+  def getAvailableProjects(options = {})
+    codebase_dir = "/codebase"
+
+    files = Dir.entries(codebase_dir).select do |file|
+      if file == '.' || file == '..' then
+        false
+      else
+        File.directory? File.join(codebase_dir, file)
+      end
+    end
+
+    return files
   end
 
 private
