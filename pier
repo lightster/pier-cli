@@ -16,7 +16,7 @@ class Pier
       exit 0
     end
 
-    if command == "help" or command.to_s.empty? then
+    if command == "help" || command.to_s.empty? then
       projects = getAvailableProjects({shortened: true})
       puts <<HELP
 Usage:
