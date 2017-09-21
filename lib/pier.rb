@@ -1,3 +1,4 @@
+require "pier/moor"
 require "pier/pier"
 require "pier/version"
 
