@@ -36,10 +36,7 @@ HELP
         end
         full_command = escaped.join " "
 
-        exec("
-          cd '#{project_dir}' \
-            && make #{full_command} 1>&2
-        ")
+        runShellProcOrDie %Q(cd '#{project_dir}' && make #{full_command})
       end
     end
 
