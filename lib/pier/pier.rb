@@ -1,7 +1,9 @@
 require 'shellwords'
 
 module Pier
-  class Pier
+  class Pier::Pier
+    include ::Pier
+
     def initialize(argv)
       @argv = Array.new(argv)
     end
@@ -42,7 +44,7 @@ HELP
     end
 
     def getAvailableProjects(options = {})
-      codebase_dir = "/codebase"
+      codebase_dir = getCodebaseDir()
 
       files = Dir.entries(codebase_dir).select do |file|
         if file == '.' || file == '..' then
@@ -73,7 +75,7 @@ HELP
   private
 
     def getProjectDir(project)
-      codebase_dir = "/codebase"
+      codebase_dir = getCodebaseDir()
 
       repo_dir = "#{codebase_dir}/#{project}"
       if Dir.exists?(repo_dir) then

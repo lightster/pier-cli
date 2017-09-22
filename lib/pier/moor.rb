@@ -1,8 +1,12 @@
 
 module Pier
   class Moor
+    include ::Pier
+
     def initialize(argv)
       @argv = Array.new(argv)
+      # TODO: make this a command line option
+      @clone_dir = "/vagrant-nfs/codebase/"
     end
 
     def run()
@@ -30,13 +34,12 @@ HELP
 
       namespaced_repo = repo.sub('/', '.')
 
-      codebase_dir = "/codebase"
+      codebase_dir = getCodebaseDir()
       repo_dir = "#{codebase_dir}/#{namespaced_repo}"
 
       if !Dir.exist?(repo_dir) then
         git_output = %x(
-          cd "#{codebase_dir}" \
-            && git clone git@github.com:#{repo}.git "#{repo_dir}" 2>&1
+          git clone git@github.com:#{repo}.git "#{@clone_dir}/#{namespaced_repo}" 2>&1
         )
 
         if $?.exitstatus != 0 then
