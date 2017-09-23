@@ -8,10 +8,13 @@ module Pier
   end
 
   def runShellProc(command)
-    IO.popen(command, :err=>[:child, :out]) do |io|
-      while (output = io.gets) do
-        puts output
+    begin
+      IO.popen(command, :err=>[:child, :out]) do |io|
+        while (output = io.gets) do
+          puts output
+        end
       end
+    rescue Interrupt => e
     end
 
     $?
@@ -20,7 +23,7 @@ module Pier
   def runShellProcOrDie(command)
     result = runShellProc command
 
-    if result.exitstatus != 0 then
+    if result.exitstatus != 0 && !result.exitstatus.nil? then
       exit result.exitstatus
     end
   end
