@@ -32,14 +32,12 @@ HELP
     def install(repo)
       abort "A repo name must be provided" if repo.to_s.empty?
 
-      namespaced_repo = repo.sub('/', '.')
-
       codebase_dir = getCodebaseDir()
-      repo_dir = "#{codebase_dir}/#{namespaced_repo}"
+      repo_dir = "#{codebase_dir}/#{repo}"
 
       if !Dir.exist?(repo_dir) then
         runShellProcOrDie %W(
-          git clone git@github.com:#{repo}.git #{@clone_dir}/#{namespaced_repo}
+          git clone git@github.com:#{repo}.git #{@clone_dir}/#{repo}
         )
       end
 
