@@ -43,24 +43,30 @@ HELP
     def getAvailableProjects(options = {})
       codebase_dir = getCodebaseDir()
 
-      files = Dir.entries(codebase_dir).select do |file|
-        if file == '.' || file == '..' then
+      repo_pattern = "#{codebase_dir}/*/*"
+      files = Dir.glob(repo_pattern).select do |file|
+        if file == '.' || file == '..' || !File.directory?("#{file}/.git") then
           false
         else
-          File.directory? File.join(codebase_dir, file)
+          File.directory? file
         end
+      end.map do |file|
+        namespace = File.basename(File.dirname(file))
+        repo = File.basename(file)
+
+        File.join(namespace, repo)
       end
 
       return files if !options[:shortened]
 
       project_counts = files.each_with_object(Hash.new(0)) do |fq_project, counts|
-        project = fq_project.rpartition('.')[2]
+        project = File.basename(fq_project)
 
         counts[project] += 1
       end
 
       files.map do |fq_project|
-        project = fq_project.rpartition('.')[2]
+        project = File.basename(fq_project)
         if project_counts[project] == 1 then
           project
         else
@@ -75,11 +81,11 @@ HELP
       codebase_dir = getCodebaseDir()
 
       repo_dir = "#{codebase_dir}/#{project}"
-      if Dir.exists?(repo_dir) then
+      if project.include?('/') && Dir.exists?(repo_dir) then
         return repo_dir
       end
 
-      repo_pattern = "#{codebase_dir}/*.#{project}"
+      repo_pattern = "#{codebase_dir}/*/#{project}"
       matches = Dir.glob(repo_pattern)
       if matches.length == 1 then
         return matches[0]
