@@ -1,7 +1,7 @@
 require 'shellwords'
 
 module Pier
-  class Pier::Pier
+  class Pier
     include ::Pier
 
     def initialize(argv)
