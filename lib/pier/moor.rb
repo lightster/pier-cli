@@ -1,4 +1,3 @@
-
 module Pier
   class Moor
     include ::Pier
