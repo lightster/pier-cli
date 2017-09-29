@@ -6,6 +6,7 @@ module Pier
       @argv = Array.new(argv)
       # TODO: make this a command line option
       @clone_dir = "/vagrant-nfs/codebase/"
+      @config = Config.new
     end
 
     def run()
@@ -41,11 +42,13 @@ HELP
       end
 
       if File.exist?("#{repo_dir}/configure") then
-        runShellProcOrDie %Q(cd "#{repo_dir}" && ./configure docker)
+        configure_cmd = @config.get('moor', 'install', 'configure')
+        runShellProcOrDie %Q(cd "#{repo_dir}" && #{configure_cmd})
       end
 
       if File.exist?("#{repo_dir}/Makefile") then
-        runShellProcOrDie %Q(cd '#{repo_dir}' && make install)
+        make_cmd = @config.get('moor', 'install', 'make')
+        runShellProcOrDie %Q(cd '#{repo_dir}' && #{make_cmd})
       end
     end
   end
