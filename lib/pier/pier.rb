@@ -4,8 +4,9 @@ module Pier
   class Pier
     include ::Pier
 
-    def initialize(argv)
+    def initialize(cwd, argv)
       @argv = Array.new(argv)
+      @workspace_config = WorkspaceConfig.new.load_from_workspace(cwd)
     end
 
     def run()
@@ -41,7 +42,7 @@ HELP
     end
 
     def getAvailableProjects(options = {})
-      codebase_dir = getCodebaseDir()
+      codebase_dir = @workspace_config.codebase_dir
 
       repo_pattern = "#{codebase_dir}/*/*"
       files = Dir.glob(repo_pattern).select do |file|
@@ -78,7 +79,7 @@ HELP
   private
 
     def getProjectDir(project)
-      codebase_dir = getCodebaseDir()
+      codebase_dir = @workspace_config.codebase_dir
 
       repo_dir = "#{codebase_dir}/#{project}"
       if project.include?('/') && Dir.exists?(repo_dir) then

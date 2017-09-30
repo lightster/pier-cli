@@ -4,10 +4,6 @@ require "pier/pier"
 require "pier/version"
 
 module Pier
-  def getCodebaseDir
-    File.dirname(__FILE__) + "/../../"
-  end
-
   def runShellProc(command)
     begin
       IO.popen(command, :err=>[:child, :out]) do |io|
