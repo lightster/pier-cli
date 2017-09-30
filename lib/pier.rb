@@ -7,8 +7,9 @@ module Pier
   def runShellProc(command)
     begin
       IO.popen(command, :err=>[:child, :out]) do |io|
-        while (output = io.gets) do
-          puts output
+        while (output = io.getc) do
+          print output
+          $stdout.flush
         end
       end
     rescue Interrupt => e
