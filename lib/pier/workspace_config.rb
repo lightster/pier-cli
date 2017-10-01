@@ -1,3 +1,4 @@
+require "pier/config"
 require 'yaml'
 
 module Pier

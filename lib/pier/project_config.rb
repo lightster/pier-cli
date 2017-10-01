@@ -1,23 +1,18 @@
+require "pier/config"
+
 module Pier
   class ProjectConfig
+    include Config
+
     def initialize
-      @config = {
+      init_config({
         'moor' => {
           'install' => {
             'configure' => './configure docker',
             'make' => 'make install',
           },
         },
-      }
-    end
-
-    def get(*keys)
-      current = @config
-      keys.each do |key|
-        current = current[key]
-      end
-
-      current
+      })
     end
   end
 end
