@@ -1,5 +1,5 @@
 module Pier
-  class Config
+  class ProjectConfig
     def initialize
       @config = {
         'moor' => {
