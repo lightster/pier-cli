@@ -7,7 +7,7 @@ module Pier
 
     def initialize(cwd, argv)
       @argv = Array.new(argv)
-      @workspace_config = WorkspaceConfig.new.load_from_workspace(cwd)
+      @workspace_config = WorkspaceConfig.new(cwd)
       @project_config = ProjectConfig.new
     end
 
@@ -16,7 +16,7 @@ module Pier
       command = args.shift
 
       if command == "install" then
-        install(args[0] || "")
+        install(*args)
         exit 0
       end
 
@@ -26,12 +26,13 @@ Usage:
 
 Available commands:
   install    Install a project
+  config     Set config option that all projects in workspace will have access to
   help       Output this help documentation
 HELP
       exit 0
     end
 
-    def install(repo)
+    def install(repo = "")
       abort "A repo name must be provided" if repo.to_s.empty?
 
       codebase_dir = @workspace_config.codebase_dir

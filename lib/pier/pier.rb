@@ -6,7 +6,7 @@ module Pier
 
     def initialize(cwd, argv)
       @argv = Array.new(argv)
-      @workspace_config = WorkspaceConfig.new.load_from_workspace(cwd)
+      @workspace_config = WorkspaceConfig.new(cwd)
     end
 
     def run()

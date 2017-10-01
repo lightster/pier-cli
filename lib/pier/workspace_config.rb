@@ -5,36 +5,38 @@ module Pier
     attr_reader :codebase_dir
     attr_reader :clone_dir
 
-    def initialize
-      @codebase_dir = nil
-      @clone_dir = nil
+    def initialize(config)
+      if config.is_a?(String)
+        load_from_workspace(config)
+      end
     end
+
+  private
 
     def load_from_workspace(cwd)
       dot_pier = locate_workspace_root(cwd)
       root = File.dirname(dot_pier)
       config_file = File.join(dot_pier, "config")
 
-      config = {}
       if File.exists?(config_file)
-        config = YAML.load_file(config_file)
+        @config = YAML.load_file(config_file)
+      end
+
+      if !@config.is_a?(Hash) then
+        @config = {}
       end
 
       @codebase_dir = "codebase"
-      if config.key?("codebase_dir") then
-        @codebase_dir = config["codebase_dir"]
+      if @config.key?("codebase_dir") then
+        @codebase_dir = @config["codebase_dir"]
       end
       @codebase_dir = File.absolute_path(@codebase_dir, root)
 
       @clone_dir = @codebase_dir
-      if config.key?("codebase_dir") then
-        @clone_dir = File.absolute_path(config["clone_dir"], root)
+      if @config.key?("codebase_dir") then
+        @clone_dir = File.absolute_path(@config["clone_dir"], root)
       end
-
-      self
     end
-
-  private
 
     def locate_workspace_root(cwd)
       dir = cwd
