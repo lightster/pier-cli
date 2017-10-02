@@ -3,8 +3,6 @@ require 'yaml'
 
 module Pier
   class WorkspaceConfig
-    include Config
-
     attr_reader :codebase_dir
     attr_reader :clone_dir
 
@@ -13,22 +11,26 @@ module Pier
       load_from_workspace
     end
 
-    def save
-      File.write(@config_yaml, get_all.to_yaml)
+    def get(key)
+      @defaults.get(key)
+    end
+
+    def has?(key)
+      @defaults.has?(key)
+    end
+
+    def set(key, value)
+      @defaults.set(key, value)
+      @defaults.save_file(File.join(@dot_pier, "config"))
     end
 
   private
 
     def load_from_workspace()
-      if File.exists?(@config_yaml)
-        config = YAML.load_file(@config_yaml)
+      @defaults = Config.new
+      if File.exists?(default_yaml)
+        @defaults.load_file!(default_yaml)
       end
-
-      if !config.is_a?(Hash) then
-        config = {}
-      end
-
-      init_config(config)
 
       @codebase_dir = "codebase"
       if has?("codebase_dir") then
@@ -42,6 +44,10 @@ module Pier
       end
     end
 
+    def default_yaml
+      File.join(@dot_pier, "config")
+    end
+
     def locate_workspace_root(cwd)
       dir = cwd
       prev_dir = nil
@@ -52,7 +58,6 @@ module Pier
         if File.directory?(dot_pier) then
           @workspace_root = dir
           @dot_pier = dot_pier
-          @config_yaml = File.join(@dot_pier, "config")
           return
         end
 

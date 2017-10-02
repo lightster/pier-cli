@@ -61,7 +61,6 @@ HELP
 
     def config(name, value)
       @workspace_config.set(name, value)
-      @workspace_config.save
     end
   end
 end

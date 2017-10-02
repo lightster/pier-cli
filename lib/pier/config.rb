@@ -1,7 +1,11 @@
 module Pier
-  module Config
+  class Config
+    def initialize
+      @config = {}
+    end
+
     def get(key)
-      current = @pier_mixin_config
+      current = @config
       parse_key(key).each do |key_part|
         return nil if !current.key?(key_part)
 
@@ -12,7 +16,7 @@ module Pier
     end
 
     def has?(key)
-      current = @pier_mixin_config
+      current = @config
       parse_key(key).each do |key_part|
         return false if !current.key?(key_part)
 
@@ -22,7 +26,7 @@ module Pier
 
     def set(key, value)
       prev = nil
-      current = @pier_mixin_config
+      current = @config
 
       keys = parse_key(key)
       keys.each do |key_part|
@@ -39,14 +43,18 @@ module Pier
       end
     end
 
-  protected
+    def load_file!(yaml_file)
+      if File.exists?(yaml_file)
+        @config = YAML.load_file(yaml_file)
+      end
 
-    def get_all
-      @pier_mixin_config
+      if !@config.is_a?(Hash) then
+        @config = {}
+      end
     end
 
-    def init_config(config)
-      @pier_mixin_config = config
+    def save_file(yaml_file)
+      File.write(yaml_file, @config.to_yaml)
     end
 
   private
