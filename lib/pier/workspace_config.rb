@@ -21,7 +21,7 @@ module Pier
 
     def set(key, value)
       @defaults.set(key, value)
-      @defaults.save_file(File.join(@dot_pier, "config"))
+      @defaults.save_file(File.join(@dot_pier, "config.defaults.yaml"))
     end
 
   private
@@ -45,7 +45,7 @@ module Pier
     end
 
     def default_yaml
-      File.join(@dot_pier, "config")
+      File.join(@dot_pier, "config.defaults.yaml")
     end
 
     def locate_workspace_root(cwd)
