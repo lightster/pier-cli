@@ -59,8 +59,34 @@ HELP
       end
     end
 
-    def config(name, value)
-      @workspace_config.set(name, value)
+    def config(*args)
+      command = args.shift
+
+      if command == "set" then
+        config_set(*args)
+      end
+
+      puts <<HELP
+Usage:
+  moor config COMMAND
+
+Available commands:
+  set        Set a config option
+HELP
+      exit 1
+    end
+
+    def config_set(name = "", value = "")
+      if !name.to_s.empty? && !value.to_s.empty? then
+        @workspace_config.set(name, value)
+        exit 0
+      end
+
+      puts <<HELP
+Usage:
+  moor config set NAME VALUE
+HELP
+      exit 1
     end
   end
 end
