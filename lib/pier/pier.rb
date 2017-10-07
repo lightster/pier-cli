@@ -29,7 +29,7 @@ HELP
     end
 
     def runProjectCommand(project, commands)
-      project_dir = getProjectDir(project)
+      project_dir = @workspace_config.get_project_dir(project)
 
       if File.exist?("#{project_dir}/Makefile") then
         escaped = commands.map do |command|
@@ -74,34 +74,6 @@ HELP
           fq_project
         end
       end.sort
-    end
-
-  private
-
-    def getProjectDir(project)
-      codebase_dir = @workspace_config.codebase_dir
-
-      repo_dir = "#{codebase_dir}/#{project}"
-      if project.include?('/') && Dir.exists?(repo_dir) then
-        return repo_dir
-      end
-
-      repo_pattern = "#{codebase_dir}/*/#{project}"
-      matches = Dir.glob(repo_pattern)
-      if matches.length == 1 then
-        return matches[0]
-      elsif matches.length >= 1
-        STDERR.puts "Multiple projects match the given project name:"
-        matches.each do |path|
-          match = path.sub!("#{codebase_dir}/", '')
-          STDERR.puts " - #{match}"
-        end
-        STDERR.puts "\nPlease use a full qualified project name."
-        exit 1
-      end
-
-      STDERR.puts "No projects match '#{project}'"
-      exit 1
     end
   end
 end
