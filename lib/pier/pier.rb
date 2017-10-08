@@ -14,7 +14,7 @@ module Pier
       command = args.shift
 
       if command == "help" || command.to_s.empty? then
-        projects = getAvailableProjects({shortened: true})
+        projects = available_projects({shortened: true})
         puts <<HELP
 Usage:
   pier PROJECT
@@ -25,13 +25,13 @@ HELP
         exit 0
       end
 
-      runProjectCommand(command, args)
+      run_project_command(command, args)
     end
 
   private
 
-    def runProjectCommand(project, commands)
-      project_dir = @workspace_config.get_project_dir(project)
+    def run_project_command(project, commands)
+      project_dir = @workspace_config.project_dir(project)
 
       if File.exist?("#{project_dir}/Makefile") then
         escaped = commands.map do |command|
@@ -43,7 +43,7 @@ HELP
       end
     end
 
-    def getAvailableProjects(options = {})
+    def available_projects(options = {})
       codebase_dir = @workspace_config.codebase_dir
 
       repo_pattern = "#{codebase_dir}/*/*"

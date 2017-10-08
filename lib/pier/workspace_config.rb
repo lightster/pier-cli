@@ -24,7 +24,7 @@ module Pier
       @defaults.save_file(File.join(@dot_pier, "config.defaults.yaml"))
     end
 
-    def get_project_dir(project)
+    def project_dir(project)
       repo_dir = "#{codebase_dir}/#{project}"
       if project.include?('/') && Dir.exists?(repo_dir) then
         return repo_dir
