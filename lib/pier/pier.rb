@@ -28,6 +28,8 @@ HELP
       runProjectCommand(command, args)
     end
 
+  private
+
     def runProjectCommand(project, commands)
       project_dir = @workspace_config.get_project_dir(project)
 
