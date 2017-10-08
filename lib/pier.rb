@@ -11,7 +11,7 @@ module Pier
           $stdout.flush
         end
       end
-    rescue Interrupt => e
+    rescue Interrupt
     end
 
     $?
