@@ -6,8 +6,8 @@ module Pier
       @workspace_config = workspace_config
       @project_dir = @workspace_config.project_dir(project_name)
 
-      init_system_defaults
       load_from_project
+      init_system_defaults
     end
 
     def get(key)
@@ -24,8 +24,9 @@ module Pier
 
     def init_system_defaults
       @system_defaults = Config.new
-      @system_defaults.set('moor.install.configure', './configure docker')
-      @system_defaults.set('moor.install.make', 'make install')
+      @system_defaults.set('moor.install_options.configure', './configure docker')
+      @system_defaults.set('moor.install_options.make', 'make install')
+      @system_defaults.set('moor.install', default_install_commands)
     end
 
     def load_from_project
@@ -35,6 +36,22 @@ module Pier
 
     def defaults_yaml
       File.join(@project_dir, ".pier.yaml")
+    end
+
+    def default_install_commands
+      install_commands = []
+
+      configure_cmd = get('moor.install_options.configure')
+      if File.exist?("#{@project_dir}/configure") && configure_cmd then
+        install_commands.push(configure_cmd)
+      end
+
+      make_cmd = get('moor.install_options.make')
+      if File.exist?("#{@project_dir}/Makefile") && make_cmd then
+        install_commands.push(make_cmd)
+      end
+
+      install_commands
     end
   end
 end

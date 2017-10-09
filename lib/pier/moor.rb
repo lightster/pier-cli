@@ -49,15 +49,12 @@ HELP
 
       project_config = ProjectConfig.new(repo, @workspace_config)
 
-      if File.exist?("#{repo_dir}/configure") then
-        configure_cmd = project_config.get('moor.install.configure')
-        runShellProcOrDie %Q(cd "#{repo_dir}" && #{configure_cmd})
-      end
+      install_commands = project_config.get('moor.install') || []
+      install_commands = install_commands.values if install_commands.is_a?(Hash)
 
-      if File.exist?("#{repo_dir}/Makefile") then
-        make_cmd = project_config.get('moor.install.make')
-        runShellProcOrDie %Q(cd '#{repo_dir}' && #{make_cmd})
-      end
+      install_commands.each do |command|
+        runShellProcOrDie %Q(cd "#{repo_dir}" && #{command})
+      end if install_commands.is_a?(Array)
     end
 
     def config(*args)
