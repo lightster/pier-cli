@@ -13,6 +13,8 @@ module Pier
     def get(key)
       if @defaults.has?(key) then
         @defaults.get(key)
+      elsif @workspace_config.has?(key)
+        @workspace_config.get(key)
       else
         @system_defaults.get(key)
       end
