@@ -8,7 +8,6 @@ module Pier
     def initialize(cwd, argv)
       @argv = Array.new(argv)
       @workspace_config = WorkspaceConfig.new(cwd)
-      @project_config = ProjectConfig.new
     end
 
     def run()
@@ -48,13 +47,15 @@ HELP
         )
       end
 
+      project_config = ProjectConfig.new(repo, @workspace_config)
+
       if File.exist?("#{repo_dir}/configure") then
-        configure_cmd = @project_config.get('moor.install.configure')
+        configure_cmd = project_config.get('moor.install.configure')
         runShellProcOrDie %Q(cd "#{repo_dir}" && #{configure_cmd})
       end
 
       if File.exist?("#{repo_dir}/Makefile") then
-        make_cmd = @project_config.get('moor.install.make')
+        make_cmd = project_config.get('moor.install.make')
         runShellProcOrDie %Q(cd '#{repo_dir}' && #{make_cmd})
       end
     end
