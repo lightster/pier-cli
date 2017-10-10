@@ -1,4 +1,5 @@
-require "pier/project_config"
+require 'optparse'
+require 'pier/project_config'
 require 'pier/workspace_config'
 
 module Pier
@@ -11,14 +12,14 @@ module Pier
     end
 
     def run()
-      args = Array.new(@argv)
+      args = @argv.dup
       command = args.shift
 
       if command == "install" then
         install(*args)
         exit 0
       elsif command == "config" then
-        config(*args)
+        config(args)
         exit 0
       end
 
@@ -57,11 +58,13 @@ HELP
       end if install_commands.is_a?(Array)
     end
 
-    def config(*args)
+    def config(args)
+      args = args.dup
       command = args.shift
 
       if command == "set" then
-        config_set(*args)
+        config_set(args)
+        exit 0
       end
 
       puts <<HELP
@@ -74,16 +77,54 @@ HELP
       exit 1
     end
 
-    def config_set(name = "", value = "")
-      if !name.to_s.empty? && !value.to_s.empty? then
-        @workspace_config.set(name, value)
-        exit 0
+    def config_set(args)
+      options = {scope: :unknown}
+
+      opt_parser = OptionParser.new do |opts|
+        opts.banner = <<BANNER
+Usage:
+  moor config set [options] NAME VALUE
+
+Options:
+BANNER
+
+        opts.summary_indent = ''
+
+        opts.on("--workspace", "Set the config option at the workspace level") do
+          options[:scope] = :workspace
+        end
+
+        opts.on("--project PROJECT_NAME", "Set the config option at the project level") do |project_name|
+          options[:scope] = :project
+          options[:project_name] = project_name
+        end
       end
 
-      puts <<HELP
-Usage:
-  moor config set NAME VALUE
-HELP
+      parsed_args = opt_parser.parse(args)
+
+      name = parsed_args.shift
+      value = parsed_args.shift
+
+      if !name.to_s.empty? && !value.to_s.empty? then
+        case options[:scope]
+        when :workspace then
+          @workspace_config.set(name, value)
+          exit 0
+        when :project then
+          project_config = ProjectConfig.new(options[:project_name], @workspace_config)
+          project_config.set(name, value)
+          exit 0
+        end
+
+        raise OptionParser::InvalidOption, '--workspace or --project is required'
+        exit 1
+      end
+    rescue OptionParser::InvalidOption => exception
+      puts exception.message.capitalize
+      puts
+      puts opt_parser
+    else
+      puts opt_parser
       exit 1
     end
   end

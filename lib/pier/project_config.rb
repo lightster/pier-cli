@@ -20,6 +20,11 @@ module Pier
       end
     end
 
+    def set(key, value)
+      @defaults.set(key, value)
+      @defaults.save_file(defaults_yaml)
+    end
+
   private
 
     def init_system_defaults
