@@ -21,7 +21,7 @@ module Pier
 
     def set(key, value)
       @defaults.set(key, value)
-      @defaults.save_file(File.join(@dot_pier, "config.defaults.yaml"))
+      @defaults.save_file(defaults_yaml)
     end
 
     def project_dir(project)
@@ -52,8 +52,8 @@ module Pier
 
     def load_from_workspace()
       @defaults = Config.new
-      if File.exists?(default_yaml)
-        @defaults.load_file!(default_yaml)
+      if File.exists?(defaults_yaml)
+        @defaults.load_file!(defaults_yaml)
       end
 
       @codebase_dir = "codebase"
@@ -68,7 +68,7 @@ module Pier
       end
     end
 
-    def default_yaml
+    def defaults_yaml
       File.join(@dot_pier, "config.defaults.yaml")
     end
 
