@@ -12,10 +12,10 @@ module Pier
     end
 
     def get(key)
-      if @defaults.has?(key) then
-        @defaults.get(key)
-      else
+      if @overrides.has?(key) then
         @overrides.get(key)
+      else
+        @defaults.get(key)
       end
     end
 
