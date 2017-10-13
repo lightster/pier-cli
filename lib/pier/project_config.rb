@@ -11,7 +11,9 @@ module Pier
     end
 
     def get(key)
-      if @defaults.has?(key) then
+      if @overrides.has?(key) then
+        @overrides.get(key)
+      elsif @defaults.has?(key) then
         @defaults.get(key)
       elsif @workspace_config.has?(key)
         @workspace_config.get(key)
@@ -20,9 +22,14 @@ module Pier
       end
     end
 
-    def set(key, value)
-      @defaults.set(key, value)
-      @defaults.save_file(defaults_yaml)
+    def set(key, value, priority = :overrides)
+      if priority == :defaults then
+        @defaults.set(key, value)
+        @defaults.save_file(defaults_yaml)
+      else
+        @overrides.set(key, value)
+        @overrides.save_file(overrides_yaml)
+      end
     end
 
   private
@@ -35,12 +42,16 @@ module Pier
     end
 
     def load_from_project
-      @defaults = Config.new
-      @defaults.load_file!(defaults_yaml)
+      @defaults = Config.new(file: defaults_yaml)
+      @overrides = Config.new(file: overrides_yaml)
     end
 
     def defaults_yaml
-      File.join(@project_dir, ".pier.yaml")
+      File.join(@project_dir, ".pier.defaults.yaml")
+    end
+
+    def overrides_yaml
+      File.join(@project_dir, ".pier.overrides.yaml")
     end
 
     def default_install_commands

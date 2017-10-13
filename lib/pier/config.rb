@@ -1,7 +1,11 @@
 module Pier
   class Config
-    def initialize
+    def initialize(options = {})
       @config = {}
+
+      if options.key?(:file) && File.exists?(options[:file]) then
+        load_file!(options[:file])
+      end
     end
 
     def get(key)

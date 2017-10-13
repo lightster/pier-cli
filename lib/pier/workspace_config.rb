@@ -12,16 +12,25 @@ module Pier
     end
 
     def get(key)
-      @defaults.get(key)
+      if @defaults.has?(key) then
+        @defaults.get(key)
+      else
+        @overrides.get(key)
+      end
     end
 
     def has?(key)
-      @defaults.has?(key)
+      return @overrides.has?(key) || @defaults.has?(key)
     end
 
-    def set(key, value)
-      @defaults.set(key, value)
-      @defaults.save_file(defaults_yaml)
+    def set(key, value, priority = :overrides)
+      if priority == :defaults then
+        @defaults.set(key, value)
+        @defaults.save_file(defaults_yaml)
+      else
+        @overrides.set(key, value)
+        @overrides.save_file(overrides_yaml)
+      end
     end
 
     def project_dir(project)
@@ -51,10 +60,8 @@ module Pier
   private
 
     def load_from_workspace()
-      @defaults = Config.new
-      if File.exists?(defaults_yaml)
-        @defaults.load_file!(defaults_yaml)
-      end
+      @defaults = Config.new(file: defaults_yaml)
+      @overrides = Config.new(file: overrides_yaml)
 
       @codebase_dir = "codebase"
       if has?("codebase_dir") then
@@ -70,6 +77,10 @@ module Pier
 
     def defaults_yaml
       File.join(@dot_pier, "config.defaults.yaml")
+    end
+
+    def overrides_yaml
+      File.join(@dot_pier, "config.overrides.yaml")
     end
 
     def locate_workspace_root(cwd)

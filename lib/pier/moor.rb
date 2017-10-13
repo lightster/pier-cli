@@ -78,7 +78,7 @@ HELP
     end
 
     def config_set(args)
-      options = {scope: :unknown}
+      options = {visibility: :unknown, location: :overrides}
 
       opt_parser = OptionParser.new do |opts|
         opts.banner = <<BANNER
@@ -91,12 +91,16 @@ BANNER
         opts.summary_indent = ''
 
         opts.on("--workspace", "Set the config option at the workspace level") do
-          options[:scope] = :workspace
+          options[:visibility] = :workspace
         end
 
         opts.on("--project PROJECT_NAME", "Set the config option at the project level") do |project_name|
-          options[:scope] = :project
+          options[:visibility] = :project
           options[:project_name] = project_name
+        end
+
+        opts.on("--defaults", "Set the config option in the defaults config instead of the overrides config") do
+          options[:priority] = :defaults
         end
       end
 
@@ -106,13 +110,13 @@ BANNER
       value = parsed_args.shift
 
       if !name.to_s.empty? && !value.to_s.empty? then
-        case options[:scope]
+        case options[:visibility]
         when :workspace then
-          @workspace_config.set(name, value)
+          @workspace_config.set(name, value, options[:priority])
           exit 0
         when :project then
           project_config = ProjectConfig.new(options[:project_name], @workspace_config)
-          project_config.set(name, value)
+          project_config.set(name, value, options[:priority])
           exit 0
         end
 
