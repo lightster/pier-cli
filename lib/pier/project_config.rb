@@ -22,6 +22,18 @@ module Pier
       end
     end
 
+    def get_from(key, priority = nil)
+      if priority == :overrides then
+        @overrides.get(key)
+      elsif priority == :defaults then
+        @defaults.get(key)
+      elsif priority == :hierarchy then
+        get(key)
+      else
+        raise ArgumentError, 'priority should be: :overrides, :defaults, :hierarchy'
+      end
+    end
+
     def set(key, value, priority = :overrides)
       if priority == :defaults then
         @defaults.set(key, value)

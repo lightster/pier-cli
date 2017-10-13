@@ -62,8 +62,12 @@ HELP
       args = args.dup
       command = args.shift
 
-      if command == "set" then
+      case command
+      when "set" then
         config_set(args)
+        exit 0
+      when "get" then
+        config_get(args)
         exit 0
       end
 
@@ -73,12 +77,13 @@ Usage:
 
 Available commands:
   set        Set a config option
+  get        Get a config option
 HELP
       exit 1
     end
 
     def config_set(args)
-      options = {visibility: :unknown, location: :overrides}
+      options = {visibility: :unknown, priority: :overrides}
 
       opt_parser = OptionParser.new do |opts|
         opts.banner = <<BANNER
@@ -117,6 +122,64 @@ BANNER
         when :project then
           project_config = ProjectConfig.new(options[:project_name], @workspace_config)
           project_config.set(name, value, options[:priority])
+          exit 0
+        end
+
+        raise OptionParser::InvalidOption, '--workspace or --project is required'
+        exit 1
+      end
+    rescue OptionParser::InvalidOption => exception
+      puts exception.message.capitalize
+      puts
+      puts opt_parser
+    else
+      puts opt_parser
+      exit 1
+    end
+
+    def config_get(args)
+      options = {visibility: :unknown, priority: :hierarchy}
+
+      opt_parser = OptionParser.new do |opts|
+        opts.banner = <<BANNER
+Usage:
+  moor config get [options] NAME
+
+Options:
+BANNER
+
+        opts.summary_indent = ''
+
+        opts.on("--workspace", "Get the config option from the workspace level") do
+          options[:visibility] = :workspace
+        end
+
+        opts.on("--project PROJECT_NAME", "Get the config option from the project level") do |project_name|
+          options[:visibility] = :project
+          options[:project_name] = project_name
+        end
+
+        opts.on("--defaults", "Get the config option from the defaults config") do
+          options[:priority] = :defaults
+        end
+
+        opts.on("--overrides", "Get the config option from the overrides config") do
+          options[:priority] = :overrides
+        end
+      end
+
+      parsed_args = opt_parser.parse(args)
+
+      name = parsed_args.shift
+
+      if !name.to_s.empty? then
+        case options[:visibility]
+        when :workspace then
+          puts @workspace_config.get_from(name, options[:priority])
+          exit 0
+        when :project then
+          project_config = ProjectConfig.new(options[:project_name], @workspace_config)
+          puts project_config.get_from(name, options[:priority])
           exit 0
         end
 
