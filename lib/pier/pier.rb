@@ -41,6 +41,9 @@ HELP
 
         runShellProcOrDie %Q(cd '#{project_dir}' && make #{full_command})
       end
+    rescue Error::UndeterminedProjectError => exception
+      STDERR.puts exception.message
+      exit 1
     end
 
     def available_projects(options = {})

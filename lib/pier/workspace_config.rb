@@ -1,4 +1,5 @@
 require "pier/config"
+require 'pier/error/undetermined_project_error.rb'
 require 'yaml'
 
 module Pier
@@ -56,17 +57,16 @@ module Pier
       if matches.length == 1 then
         return matches[0]
       elsif matches.length >= 1
-        STDERR.puts "Multiple projects match the given project name:"
+        error = "Multiple projects match the given project name:\n"
         matches.each do |path|
-          match = path.sub!("#{codebase_dir}/", '')
-          STDERR.puts " - #{match}"
+          match = path.sub("#{codebase_dir}/", '')
+          error << " - #{match}\n"
         end
-        STDERR.puts "\nPlease use a full qualified project name."
-        exit 1
+        error << "\nPlease use a full qualified project name."
+        raise Error::UndeterminedProjectError, error
       end
 
-      STDERR.puts "No projects match '#{project}'"
-      exit 1
+      raise Error::UndeterminedProjectError, "No projects match '#{project}'"
     end
 
   private
