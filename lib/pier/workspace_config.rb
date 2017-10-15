@@ -48,7 +48,7 @@ module Pier
 
     def project_dir(project)
       repo_dir = "#{codebase_dir}/#{project}"
-      if project.include?('/') && Dir.exists?(repo_dir) then
+      if project.include?('/') && Dir.exist?(repo_dir) then
         return repo_dir
       end
 

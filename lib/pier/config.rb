@@ -3,7 +3,7 @@ module Pier
     def initialize(options = {})
       @config = {}
 
-      if options.key?(:file) && File.exists?(options[:file]) then
+      if options.key?(:file) && File.exist?(options[:file]) then
         load_file!(options[:file])
       end
     end
@@ -48,7 +48,7 @@ module Pier
     end
 
     def load_file!(yaml_file)
-      if File.exists?(yaml_file)
+      if File.exist?(yaml_file)
         @config = YAML.load_file(yaml_file)
       end
 
