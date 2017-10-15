@@ -6,6 +6,7 @@ module Pier
   class WorkspaceConfig
     attr_reader :codebase_dir
     attr_reader :clone_dir
+    attr_reader :workspace_root
 
     def initialize(cwd)
       locate_workspace_root(cwd)

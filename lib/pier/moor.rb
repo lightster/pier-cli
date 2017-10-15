@@ -21,6 +21,9 @@ module Pier
       elsif command == "config" then
         config(args)
         exit 0
+      elsif command == "map-to-guest-workspace" then
+        map_to_guest_workspace(*args)
+        exit 0
       end
 
       puts <<HELP
@@ -194,5 +197,9 @@ BANNER
       puts opt_parser
       exit 1
     end
+  end
+
+  def map_to_guest_workspace(host_workspace = "", pwd = "")
+    puts pwd.sub(host_workspace, @workspace_config.workspace_root)
   end
 end
