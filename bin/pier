@@ -2,8 +2,10 @@
 
 $VERBOSE = true
 
-$LOAD_PATH.unshift File.dirname(__FILE__) + "/../lib"
+require 'pathname'
 
-require "pier"
+$LOAD_PATH.unshift File.dirname(Pathname.new(__FILE__).realpath) + "/../lib"
+
+require 'pier'
 
 Pier::Pier.new(Dir.pwd, ARGV).run()
