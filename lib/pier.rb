@@ -1,6 +1,6 @@
-require "pier/moor"
-require "pier/pier"
-require "pier/version"
+require 'pier/moor'
+require 'pier/pier'
+require 'pier/version'
 
 module Pier
   def runShellProc(command)

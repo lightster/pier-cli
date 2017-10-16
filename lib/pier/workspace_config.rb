@@ -1,4 +1,4 @@
-require "pier/config"
+require 'pier/config'
 require 'pier/error/undetermined_project_error.rb'
 require 'yaml'
 

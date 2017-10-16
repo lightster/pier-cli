@@ -1,4 +1,4 @@
-require "pier/config"
+require 'pier/config'
 
 module Pier
   class ProjectConfig
