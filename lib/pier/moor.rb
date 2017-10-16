@@ -56,9 +56,15 @@ HELP
       install_commands = project_config.get('moor.install') || []
       install_commands = install_commands.values if install_commands.is_a?(Hash)
 
-      install_commands.each do |command|
-        runShellProcOrDie %Q(cd "#{repo_dir}" && #{command})
-      end if install_commands.is_a?(Array)
+      Dir.chdir(repo_dir) do
+        install_commands.each do |command|
+          if command.respond_to?(:call)
+            runShellProcOrDie(command.call)
+          else
+            runShellProcOrDie(command)
+          end
+        end if install_commands.is_a?(Array)
+      end
     end
 
     def config(args)
