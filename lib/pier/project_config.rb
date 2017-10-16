@@ -5,7 +5,6 @@ module Pier
     def initialize(project_name, workspace_config)
       @workspace_config = workspace_config
       @project_name = project_name
-      # @system_defaults = nil
     end
 
     def get(key)
