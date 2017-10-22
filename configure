@@ -1,0 +1,68 @@
+#!/bin/bash
+
+cd $(dirname ${0})
+SRCDIR=$(cd "${SCRIPT_DIR}" && pwd)
+PREFIX="/usr/local"
+
+POP_ARGS=("$@")
+
+function pop_arg_val()
+{
+  local current="${POP_ARGS[0]}"
+
+  # if an equal sign is encountered before a quote
+  if [[ $current =~ ^[^\"\']*?= ]]; then
+    POPPED_ARG=$(echo "${POP_ARGS[0]}" | sed -E 's#([^"'"'"']*?)=(.*)$#\2#g')
+    POP_ARGS=("${POP_ARGS[@]:1}")
+  else
+    POPPED_ARG="${POP_ARGS[1]}"
+    POP_ARGS=("${POP_ARGS[@]:2}")
+  fi
+}
+
+function pop_arg()
+{
+  POP_ARGS=("${POP_ARGS[@]:1}")
+}
+
+while [ ${#POP_ARGS[@]} -gt 0 ]; do
+  case "${POP_ARGS[0]}" in
+    --help|-h)
+      cat <<HELP
+Usage: $0 [OPTIONS]
+
+Options:
+  -h, --help
+              Display this help message
+  --srcdir
+              Set the directory to where the codebase is installed
+  --prefix
+              Set the directory to where the bin install directory is located
+HELP
+      exit 1
+      ;;
+
+    --srcdir|--srcdir=*)
+      pop_arg_val
+      SRCDIR="${POPPED_ARG}"
+      ;;
+
+    --prefix|--prefix=*)
+      pop_arg_val
+      PREFIX="${POPPED_ARG}"
+      ;;
+
+    *)
+      echo "Unknown option ${POP_ARGS[0]}"
+      exit 1
+      ;;
+  esac
+done
+
+cat >Makefile <<ENV_VARS
+SRCDIR=${SRCDIR}
+PREFIX=${PREFIX}
+
+ENV_VARS
+
+tee -a Makefile <Makefile.in >/dev/null

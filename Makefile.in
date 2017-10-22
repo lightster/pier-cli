@@ -1,0 +1,7 @@
+install:
+ifeq ($(wildcard $(PREFIX)/bin/pier),)
+	ln -sfn $(SRCDIR)/bin/pier $(PREFIX)/bin/pier
+endif
+ifeq ($(wildcard $(PREFIX)/bin/moor),)
+	ln -sfn $(SRCDIR)/bin/moor $(PREFIX)/bin/moor
+endif
