@@ -206,6 +206,10 @@ BANNER
   end
 
   def map_to_guest_workspace(host_workspace = "", pwd = "")
-    puts pwd.sub(host_workspace, @workspace_config.workspace_root)
+    mapped_dir = pwd.sub(host_workspace, @workspace_config.workspace_root)
+    if mapped_dir == pwd && !File.exist?(mapped_dir) then
+      throw :outside_workspace
+    end
+    puts mapped_dir
   end
 end
