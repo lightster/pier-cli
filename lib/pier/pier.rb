@@ -22,7 +22,7 @@ Usage:
 Available projects:
   #{projects.join("\n  ")}
 HELP
-        exit 0
+        exit 1
       end
 
       run_project_command(command, args)

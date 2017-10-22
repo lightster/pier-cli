@@ -38,7 +38,7 @@ Available commands:
   config     Set config option that all projects in workspace will have access to
   help       Output this help documentation
 HELP
-      exit 0
+      exit 1
     end
 
     def install(repo = "")
