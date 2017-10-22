@@ -24,6 +24,9 @@ module Pier
       elsif command == "map-to-guest-workspace" then
         map_to_guest_workspace(*args)
         exit 0
+      elsif command == "cd-dir" then
+        cd_dir(*args)
+        exit 0
       end
 
       puts <<HELP
@@ -202,6 +205,23 @@ BANNER
     else
       puts opt_parser
       exit 1
+    end
+  end
+
+  def cd_dir(project = "")
+    if !project.to_s.empty? then
+      project_dir = @workspace_config.project_dir(project)
+
+      if ENV['PIER_HOST_ROOT'] then
+        project_dir = project_dir.sub(
+          @workspace_config.workspace_root,
+          ENV['PIER_HOST_ROOT']
+        )
+      end
+
+      print project_dir
+    else
+      print ENV['PIER_HOST_ROOT'] || @workspace_config.workspace_root
     end
   end
 
