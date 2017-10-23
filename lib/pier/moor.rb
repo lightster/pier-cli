@@ -9,6 +9,7 @@ module Pier
     def initialize(cwd, argv)
       @argv = Array.new(argv)
       @workspace_config = WorkspaceConfig.new(cwd)
+      @cwd = cwd
     end
 
     def run()
@@ -193,10 +194,17 @@ BANNER
           project_config = ProjectConfig.new(options[:project_name], @workspace_config)
           puts project_config.get_from(name, options[:priority])
           exit 0
+        else
+          begin
+            project_name = @workspace_config.project_name_from_cwd(@cwd)
+            project_config = ProjectConfig.new(project_name, @workspace_config)
+            puts project_config.get_from(name, options[:priority])
+            exit 0
+          rescue Error::UndeterminedProjectError
+            raise OptionParser::InvalidOption, '--workspace or --project is required, or command must be ran from inside project directory'
+            exit 1
+          end
         end
-
-        raise OptionParser::InvalidOption, '--workspace or --project is required'
-        exit 1
       end
     rescue OptionParser::InvalidOption => exception
       puts exception.message.capitalize

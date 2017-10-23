@@ -70,6 +70,28 @@ module Pier
       raise Error::UndeterminedProjectError, "No projects match '#{project}'"
     end
 
+    def project_name_from_cwd(cwd)
+      codebase_real = File.realpath(codebase_dir)
+      cwd = File.realpath(cwd)
+
+      org_name = ""
+      project_name = ""
+      loop do
+        project_name = org_name
+        org_name = File.basename(cwd)
+
+        cwd = File.dirname(cwd)
+
+        break if cwd == codebase_real || !cwd.include?(codebase_real)
+      end
+
+      if org_name.empty? || project_name.empty? then
+        raise Error::UndeterminedProjectError, "Project could not be determined from CWD"
+      end
+
+      "#{org_name}/#{project_name}"
+    end
+
   private
 
     def load_from_workspace()
