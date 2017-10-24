@@ -62,9 +62,11 @@ HELP
 
       Dir.chdir(repo_dir) do
         install_commands.each do |command|
-          if command.respond_to?(:call)
-            runShellProcOrDie(command.call)
-          else
+          if command.respond_to?(:call) then
+            command = command.call
+          end
+
+          if command then
             runShellProcOrDie(command)
           end
         end if install_commands.is_a?(Array)
