@@ -17,7 +17,7 @@ module Pier
       command = args.shift
 
       if command == "install" then
-        install(*args)
+        install(args)
         exit 0
       elsif command == "config" then
         config(args)
@@ -42,8 +42,30 @@ HELP
       exit 1
     end
 
-    def install(repo = "")
-      abort "A repo name must be provided" if repo.to_s.empty?
+    def install(args)
+      options = {branch: nil}
+
+      opt_parser = OptionParser.new do |opts|
+        opts.banner = <<BANNER
+Usage:
+moor install [options] REPO_NAME
+
+Options:
+BANNER
+
+        opts.summary_indent = ''
+
+        opts.on("--branch BRANCH_NAME", "Set the config option at the workspace level") do |branch_name|
+          options[:branch] = branch_name
+        end
+      end
+
+      parsed_args = opt_parser.parse(args)
+
+      repo = parsed_args.shift
+      if repo.to_s.empty? then
+        raise OptionParser::InvalidOption, 'A repo name must be provided'
+      end
 
       codebase_dir = @workspace_config.codebase_dir
       clone_dir = @workspace_config.clone_dir
@@ -53,6 +75,11 @@ HELP
         runShellProcOrDie %W(
           git clone git@github.com:#{repo}.git #{clone_dir}/#{repo}
         )
+      end
+
+      branch = options[:branch]
+      if !branch.empty? then
+        runShellProcOrDie %Q(cd #{clone_dir}/#{repo} && git checkout #{branch})
       end
 
       project_config = ProjectConfig.new(repo, @workspace_config)
@@ -71,6 +98,10 @@ HELP
           end
         end if install_commands.is_a?(Array)
       end
+    rescue OptionParser::InvalidOption => exception
+      puts exception.message.capitalize
+      puts
+      puts opt_parser
     end
 
     def config(args)
