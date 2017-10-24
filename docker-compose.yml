@@ -1,0 +1,13 @@
+version: '3.3'
+services:
+  pier-buoy:
+    image: nginx:1.12.1
+    restart: always
+    volumes:
+      - ./docker/web-proxy/nginx/conf.d:/etc/nginx/conf.d/
+    ports:
+      - "80:80"
+networks:
+  default:
+    external:
+      name: pier-buoy
