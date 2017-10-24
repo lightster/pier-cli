@@ -78,7 +78,7 @@ BANNER
       end
 
       branch = options[:branch]
-      if !branch.empty? then
+      if !branch.to_s.empty? then
         runShellProcOrDie %Q(cd #{clone_dir}/#{repo} && git checkout #{branch})
       end
 
