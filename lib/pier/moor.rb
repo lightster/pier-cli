@@ -55,7 +55,7 @@ BANNER
 
         opts.summary_indent = ''
 
-        opts.on("--branch BRANCH_NAME", "Set the config option at the workspace level") do |branch_name|
+        opts.on("--branch BRANCH_NAME", "Set the branch name to checkout after cloning project") do |branch_name|
           options[:branch] = branch_name
         end
 
