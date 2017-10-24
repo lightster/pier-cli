@@ -43,7 +43,7 @@ HELP
     end
 
     def install(args)
-      options = {branch: nil}
+      options = {branch: nil, config: {}}
 
       opt_parser = OptionParser.new do |opts|
         opts.banner = <<BANNER
@@ -57,6 +57,17 @@ BANNER
 
         opts.on("--branch BRANCH_NAME", "Set the config option at the workspace level") do |branch_name|
           options[:branch] = branch_name
+        end
+
+        opts.on("--config CONFIG", "Set a config option at the project level after cloning project") do |config_pair|
+          key, valid, value = config_pair.partition('=')
+
+          if valid.empty? then
+            raise OptionParser::InvalidOption,
+              "Config options should be in key=value pairs. '#{config_pair}' does not contain an equals sign."
+          end
+
+          options[:config][key] = value
         end
       end
 
@@ -83,6 +94,12 @@ BANNER
       end
 
       project_config = ProjectConfig.new(repo, @workspace_config)
+
+      unless options[:config].empty? then
+        options[:config].each_pair do |key, value|
+          project_config.set(key, value, :overrides)
+        end
+      end
 
       install_commands = project_config.get('moor.install') || []
       install_commands = install_commands.values if install_commands.is_a?(Hash)
