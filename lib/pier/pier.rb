@@ -30,17 +30,19 @@ HELP
 
   private
 
-    def run_project_command(project, commands)
-      project_dir = @workspace_config.project_dir(project)
+    def run_project_command(project_name, args)
+      project_dir = @workspace_config.project_dir(project_name)
+      project_config = ProjectConfig.new(project_name, @workspace_config)
 
-      if File.exist?("#{project_dir}/Makefile") then
-        escaped = commands.map do |command|
-          command.shellescape
-        end
-        full_command = escaped.join " "
+      base_command = project_config.get('pier.run.command')
 
-        runShellProcOrDie %Q(cd '#{project_dir}' && make #{full_command})
+      escaped = args.map do |command|
+        command.shellescape
       end
+      escaped_args = escaped.join " "
+      full_command = "#{base_command} #{escaped_args}"
+
+      runShellProcOrDie %Q(cd '#{project_dir}' && #{full_command})
     rescue Error::UndeterminedProjectError => exception
       STDERR.puts exception.message
       exit 1

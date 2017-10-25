@@ -44,6 +44,7 @@ module Pier
   private
     def generate_system_defaults
       system_defaults = Config.new
+      system_defaults.set('pier.run.command', 'make')
       system_defaults.set('moor.install_options.configure', './configure pier')
       system_defaults.set('moor.install_options.make', 'make install')
       system_defaults.set('moor.install', default_install_commands)
