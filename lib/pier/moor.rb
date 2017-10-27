@@ -30,13 +30,17 @@ module Pier
         exit 0
       end
 
+      unless ENV['PIER_MOOR_BASH'].to_s.empty? then
+        cd_command = "\n  cd         Change directories to the root of a project"
+      end
+
       puts <<HELP
 Usage:
   moor COMMAND
 
-Available commands:
-  install    Install a project
+Available commands:#{cd_command}
   config     Set config option that all projects in workspace will have access to
+  install    Install a project
   help       Output this help documentation
 HELP
       exit 1
