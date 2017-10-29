@@ -4,14 +4,18 @@ require 'pier/version'
 
 module Pier
   def runShellProc(command)
-    system(command)
+    begin
+      system(command)
+    rescue Interrupt
+    end
+
     $?
   end
 
   def runShellProcOrDie(command)
     result = runShellProc command
 
-    if result.exitstatus != 0 && !result.exitstatus.nil? then
+    if !result.nil? && result.exitstatus != 0 && !result.exitstatus.nil? then
       exit result.exitstatus
     end
   end
