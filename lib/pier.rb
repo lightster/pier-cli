@@ -4,16 +4,7 @@ require 'pier/version'
 
 module Pier
   def runShellProc(command)
-    begin
-      IO.popen(command, :err=>[:child, :out]) do |io|
-        while (output = io.getc) do
-          print output
-          $stdout.flush
-        end
-      end
-    rescue Interrupt
-    end
-
+    system(command)
     $?
   end
 
