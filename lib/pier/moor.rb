@@ -1,6 +1,7 @@
 require 'optparse'
 require 'pier/project_config'
 require 'pier/workspace_config'
+require 'shellwords'
 
 module Pier
   class Moor
@@ -22,6 +23,9 @@ module Pier
       elsif command == "config" then
         config(args)
         exit 0
+      elsif command == "docker-compose" then
+        docker_compose(args)
+        exit 0
       elsif command == "map-to-guest-workspace" then
         map_to_guest_workspace(*args)
         exit 0
@@ -31,7 +35,7 @@ module Pier
       end
 
       unless ENV['PIER_MOOR_BASH'].to_s.empty? then
-        cd_command = "\n  cd         Change directories to the root of a project"
+        cd_command = "\n  cd                Change directories to the root of a project"
       end
 
       puts <<HELP
@@ -39,9 +43,10 @@ Usage:
   moor COMMAND
 
 Available commands:#{cd_command}
-  config     Set config option that all projects in workspace will have access to
-  install    Install a project
-  help       Output this help documentation
+  config            Set config option that all projects in workspace will have access to
+  docker-compose    Run a docker-compose command on the project found in the current working directory
+  install           Install a project
+  help              Output this help documentation
 HELP
       exit 1
     end
@@ -284,6 +289,21 @@ BANNER
       print project_dir
     else
       print ENV['PIER_HOST_ROOT'] || @workspace_config.workspace_root
+    end
+  end
+
+  def docker_compose(args)
+    project_name = @workspace_config.project_name_from_cwd(@cwd)
+    codebase_dir = @workspace_config.codebase_dir
+    repo_dir = "#{codebase_dir}/#{project_name}"
+
+    Dir.chdir(repo_dir) do
+      escaped = args.map do |command|
+        command.shellescape
+      end
+      escaped.unshift("docker-compose")
+
+      runShellProcOrDie(escaped)
     end
   end
 
