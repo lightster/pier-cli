@@ -4,9 +4,7 @@ services:
     image: nginx:1.12.1
     restart: always
     volumes:
-      - ./docker/web-proxy/nginx/http.conf:/etc/nginx/http.conf
-      - ./docker/web-proxy/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./docker/web-proxy/nginx/http.d:/etc/nginx/http.d/
+      - ./docker/web-proxy/nginx/conf.d:/etc/nginx/conf.d/
     ports:
       - "80:80"
 networks:
