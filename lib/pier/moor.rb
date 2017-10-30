@@ -92,7 +92,7 @@ BANNER
       repo_dir = "#{codebase_dir}/#{repo}"
 
       if !Dir.exist?(repo_dir) then
-        runShellProcOrDie %W(
+        runShellProcOrDie %Q(
           git clone git@github.com:#{repo}.git #{clone_dir}/#{repo}
         )
       end
