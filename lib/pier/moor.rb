@@ -303,7 +303,7 @@ BANNER
       end
       escaped.unshift("docker-compose")
 
-      runShellProcOrDie(escaped)
+      runShellProcOrDie(escaped.join(" "))
     end
   end
 
