@@ -32,3 +32,55 @@ Additionally, if you want to be able to use `moor cd` to change directories betw
 ```bash
 source /path/to/pier-cli/bin/bash_functions.sh
 ```
+
+## Moor usage
+```bash
+[~] $ cd path/to/workspace
+
+[workspace] $ moor help
+Usage:
+  moor COMMAND
+
+Available commands:
+  cd                Change directories to the root of a project
+  config            Set config option that all projects in workspace will have access to
+  docker-compose    Run a docker-compose command on the project found in the current working directory
+  install           Install a project
+  help              Output this help documentation
+
+# install lightster/hodor project from github.com
+[workspace] $ moor install lightster/hodor
+
+# install other projects from github.com
+[workspace] $ moor install lightster/yo-pdo
+[workspace] $ moor install hold-the-door/ravens
+
+# change to a project's directory
+[workspace] $ moor cd lightster/hodor
+[hodor] $
+
+# you don't need to think relative to the current working directory
+# `moor cd` knows where your projects are stored
+[hodor] $ moor cd lightster/yo-pdo
+[yo-pdo] $
+
+# get back to the workspace root
+[yo-pdo] $ moor cd
+[workspace] $ moor cd hold-the-door/ravens
+
+# run a docker-compose command for project hosted in CWD
+[ravens] $ moor docker-compose run --rm php test
+Starting ravens_rabbitmq_1 ... done
+PHPUnit 4.8.23 by Sebastian Bergmann and contributors.
+
+...............................................................  63 / 104 ( 60%)
+.........................................
+
+Time: 7.66 seconds, Memory: 15.50Mb
+
+OK (104 tests, 131 assertions)
+
+Generating code coverage report in Clover XML format ... done
+
+Generating code coverage report in HTML format ... done
+```
