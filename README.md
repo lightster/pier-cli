@@ -2,9 +2,24 @@
 Pier is a command line toolset for installing and running Docker-based dev environments for my various projects.
 
 ## Vision
-The `pier` and `moor` command line tools were created in order to allow for commands to be ran on projects hosted in a VM, especially a [Pier 11](https://github.com/lightster/pier-11) VM, without me needing to SSH into the VM.
+The `pier` and `moor` command line tools were created in order to allow for commands to be ran on projects hosted in a VM, especially a [Pier 11](https://github.com/lightster/pier-11) VM, without needing to manually SSH into the VM.
 
-## Requirements
+### What are Pier and Moor?
+The `moor` command is used for managing workspaces and projects.  The `moor` command allows you to:
+- Initialize a workspace
+- Install projects (repositories) from GitHub
+- Change your terminal’s working directory to a project directory
+- Run ad-hoc docker-compose commands on a project
+- Set config options within the workspace and projects
+
+The `pier` command is used for running commands that are defined by each project.  Example commands that a project may provide would allow you to:
+- Run a test suite
+- Execute database migrations
+- Restart container services
+- Interface with the project’s CLI or REPL
+
+## Installation
+### Requirements
 Before installing Pier, you will need to install a recent version of Ruby.  Pier is tested with Ruby 2.4.1 but may work with other versions.
 
 RVM is the recommended way of installing Ruby:
@@ -16,8 +31,7 @@ gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB8
 rvm install ruby-2.4.1
 ```
 
-## Installation
-
+### Install Pier and Moor CLI Tools
 ```bash
 git clone git@github.com:lightster/pier-cli.git
 
@@ -34,7 +48,9 @@ source /path/to/pier-cli/bin/bash_functions.sh
 ```
 
 ## Moor usage
-```bash
+### Using the `help` command
+If you remember nothing else about `moor`, remember `moor help`. You can reference it anytime you forget which commands are available.
+```ShellSession
 [~] $ cd path/to/workspace
 
 [workspace] $ moor help
@@ -47,40 +63,56 @@ Available commands:
   docker-compose    Run a docker-compose command on the project found in the current working directory
   install           Install a project
   help              Output this help documentation
+```
 
-# install lightster/hodor project from github.com
+### Installing projects
+Before we can any `pier` commands and most `moor` commands, we need to install some projects.  Projects are any Git repository hosted on GitHub.  To install a project, use `moor install` followed by a project name.
+```ShellSession
+# install projects project from github.com
 [workspace] $ moor install lightster/hodor
-
-# install other projects from github.com
 [workspace] $ moor install lightster/yo-pdo
 [workspace] $ moor install hold-the-door/ravens
+```
 
-# change to a project's directory
+By default, `moor install` will run `./configure pier` and `make install` if a `configure` script and/or a `Makefile`, respectively, exist in the project’s root directory.
+
+### Changing to a project’s directory
+If you install the `bash_functions.sh`, `moor` provides a `cd` command that allows you to change to a project’s directory from anywhere within your workspace.
+```ShellSession
 [workspace] $ moor cd lightster/hodor
-[hodor] $
-
-# you don't need to think relative to the current working directory
-# `moor cd` knows where your projects are stored
 [hodor] $ moor cd lightster/yo-pdo
-[yo-pdo] $
 
 # get back to the workspace root
 [yo-pdo] $ moor cd
-[workspace] $ moor cd hold-the-door/ravens
 
-# run a docker-compose command for project hosted in CWD
-[ravens] $ moor docker-compose run --rm php test
+# if the project name is unique to the projects installed,
+# you don't need the user/organization name
+[workspace] $ moor cd hodor
+[hodor] $ moor cd ravens
+[ravens] $
+```
+
+### Run a docker-compose command
+If a project has a docker-compose file, you can run `moor docker-compose` followed by any normal docker-compose subcommands/options:
+```ShellSession
+[ravens] $ moor docker-compose ps
+      Name                   Command            State            Ports          
+--------------------------------------------------------------------------------
+ravens_rabbitmq_1   docker-entrypoint.sh        Up      15671/tcp, 0.0.0.0:32780
+                    rabbi ...                           ->15672/tcp, 25672/tcp,
+                                                        4369/tcp, 5671/tcp,     
+                                                        0.0.0.0:32781->5672/tcp
+
+[ravens] $ moor docker-compose logs --tail=1
+Attaching to ravens_rabbitmq_1
+rabbitmq_1  |  * amqp_client
+
+[ravens] $ moor docker-compose run --rm --entrypoint='php' php -v
 Starting ravens_rabbitmq_1 ... done
-PHPUnit 4.8.23 by Sebastian Bergmann and contributors.
+PHP 5.6.24 (cli) (built: Aug 10 2016 20:10:36)
+Copyright (c) 1997-2016 The PHP Group
+Zend Engine v2.6.0, Copyright (c) 1998-2016 Zend Technologies
+    with Xdebug v2.5.5, Copyright (c) 2002-2017, by Derick Rethans
 
-...............................................................  63 / 104 ( 60%)
-.........................................
-
-Time: 7.66 seconds, Memory: 15.50Mb
-
-OK (104 tests, 131 assertions)
-
-Generating code coverage report in Clover XML format ... done
-
-Generating code coverage report in HTML format ... done
+[ravens] $
 ```
