@@ -51,9 +51,9 @@ source /path/to/pier-cli/bin/bash_functions.sh
 ### Using the `help` command
 If you remember nothing else about `moor`, remember `moor help`. You can reference it anytime you forget which commands are available.
 ```ShellSession
-[~] $ cd path/to/workspace
+[lightster@local:~] $ cd path/to/workspace
 
-[workspace] $ moor help
+[lightster@local:workspace] $ moor help
 Usage:
   moor COMMAND
 
@@ -69,9 +69,9 @@ Available commands:
 Before we can any `pier` commands and most `moor` commands, we need to install some projects.  Projects are any Git repository hosted on GitHub.  To install a project, use `moor install` followed by a project name.
 ```ShellSession
 # install projects project from github.com
-[workspace] $ moor install lightster/hodor
-[workspace] $ moor install lightster/yo-pdo
-[workspace] $ moor install hold-the-door/ravens
+[lightster@local:workspace] $ moor install lightster/hodor
+[lightster@local:workspace] $ moor install lightster/yo-pdo
+[lightster@local:workspace] $ moor install hold-the-door/ravens
 ```
 
 By default, `moor install` will run `./configure pier` and `make install` if a `configure` script and/or a `Makefile`, respectively, exist in the project’s root directory.
@@ -79,23 +79,23 @@ By default, `moor install` will run `./configure pier` and `make install` if a `
 ### Changing to a project’s directory
 If you install the `bash_functions.sh`, `moor` provides a `cd` command that allows you to change to a project’s directory from anywhere within your workspace.
 ```ShellSession
-[workspace] $ moor cd lightster/hodor
-[hodor] $ moor cd lightster/yo-pdo
+[lightster@local:workspace] $ moor cd lightster/hodor
+[lightster@local:hodor] $ moor cd lightster/yo-pdo
 
 # get back to the workspace root
-[yo-pdo] $ moor cd
+[lightster@local:yo-pdo] $ moor cd
 
 # if the project name is unique to the projects installed,
 # you don't need the user/organization name
-[workspace] $ moor cd hodor
-[hodor] $ moor cd ravens
-[ravens] $
+[lightster@local:workspace] $ moor cd hodor
+[lightster@local:hodor] $ moor cd ravens
+[lightster@local:ravens] $
 ```
 
 ### Run a docker-compose command
 If a project has a docker-compose file, you can run `moor docker-compose` followed by any normal docker-compose subcommands/options:
 ```ShellSession
-[ravens] $ moor docker-compose ps
+[lightster@local:ravens] $ moor docker-compose ps
       Name                   Command            State            Ports          
 --------------------------------------------------------------------------------
 ravens_rabbitmq_1   docker-entrypoint.sh        Up      15671/tcp, 0.0.0.0:32780
@@ -103,16 +103,16 @@ ravens_rabbitmq_1   docker-entrypoint.sh        Up      15671/tcp, 0.0.0.0:32780
                                                         4369/tcp, 5671/tcp,     
                                                         0.0.0.0:32781->5672/tcp
 
-[ravens] $ moor docker-compose logs --tail=1
+[lightster@local:ravens] $ moor docker-compose logs --tail=1
 Attaching to ravens_rabbitmq_1
 rabbitmq_1  |  * amqp_client
 
-[ravens] $ moor docker-compose run --rm --entrypoint='php' php -v
+[lightster@local:ravens] $ moor docker-compose run --rm --entrypoint='php' php -v
 Starting ravens_rabbitmq_1 ... done
 PHP 5.6.24 (cli) (built: Aug 10 2016 20:10:36)
 Copyright (c) 1997-2016 The PHP Group
 Zend Engine v2.6.0, Copyright (c) 1998-2016 Zend Technologies
     with Xdebug v2.5.5, Copyright (c) 2002-2017, by Derick Rethans
 
-[ravens] $
+[lightster@local:ravens] $
 ```
