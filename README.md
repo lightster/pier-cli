@@ -4,6 +4,8 @@ Pier is a command line toolset for installing and running Docker-based dev envir
 ## Vision
 The `pier` and `moor` command line tools were created in order to allow for commands to be ran on projects hosted in a VM, especially a [Pier 11](https://github.com/lightster/pier-11) VM, without needing to manually SSH into the VM.
 
+The Pier toolset also encourages projects to be funneled through one command—the `pier` command.  This will hopefully make it easier for developers to find needed commands without needing to sift through readme files or source code.
+
 ### What are Pier and Moor?
 The `moor` command is used for managing workspaces and projects.  The `moor` command allows you to:
 - Initialize a workspace
