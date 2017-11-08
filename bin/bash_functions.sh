@@ -6,7 +6,7 @@ function moor()
     local cd_dir
     local exit_code
     # declare vars before setting them, otherwise the exit code is from `local`
-    cd_dir=$(command moor cd-dir "${@:2}")
+    cd_dir=$(command moor cd-dir "${@:2}" </dev/null)
     exit_code=$?
 
     if [ ${exit_code} -eq 1 ]; then
