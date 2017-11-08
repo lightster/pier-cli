@@ -118,3 +118,79 @@ Zend Engine v2.6.0, Copyright (c) 1998-2016 Zend Technologies
 
 [lightster@local:ravens] $
 ```
+
+## Pier Usage
+The `pier` command takes one or more arguments.  The first argument is the name of the installed project that you want to run commands on.  Any arguments following the project name are passed on to the respective project’s run script.
+
+### Running commands
+In the following example, the run command defined by `lightster/ravens` is executed with an argument of `test`
+```ShellSession
+[lightster@local:workspace] $ pier ravens test
+docker-compose run --rm php test
+Starting ravens_rabbitmq_1 ... done
+PHPUnit 4.8.23 by Sebastian Bergmann and contributors.
+
+...
+```
+Note that the current working directory can be in the workspace root or any subdirectory of the workspace root.
+
+For an imaginary “web-project”, there might be a `restart` command to restart the web services:
+```ShellSession
+[lightster@local:ravens] $ pier web-project restart
+```
+The `restart` option is passed to web-project’s run script.
+
+### Defining commands
+Before commands for a project can be ran, the project needs to define the script that is ran by `pier`.
+
+#### Standalone script as a run command
+The “run command” for a project can be set via `moor config`.
+
+```ShellSession
+[lightster@local:workspace] $ moor config set --project=hodor --defaults pier.run.command "bash docker/pier.sh"
+```
+
+In this example, the run command for the project is set to `bash docker.sh`.  Anytime `pier hodor` is ran, `pier` executes `bash docker/pier.sh` within Hodor's root directory on the target machine (the VM if using pier-11)  Since the `pier` command passes any arguments after the project name to the run command,  running:
+```
+pier hodor test`
+```
+will run the following on the target machine
+```
+bash docker/pier.sh test
+```
+
+Similarly,
+```
+pier hodor generate-supervisor-config --hodor-config=path/to/hodor/config.php
+```
+will run the following on the target machine
+```
+bash docker/pier.sh generate-supervisor-config --hodor-config=path/to/hodor/config.php
+```
+
+Projects can even return their own help if their run command provides a `help` subcommand:
+```
+pier hodor help
+```
+
+#### Makefile as a command
+If you want to use a Makefile for your run command, you could set that up via:
+```ShellSession
+[lightster@local:workspace] $ moor config set --project=hodor --defaults pier.run.command "make"
+```
+This would cause `pier hodor test` to call `make test`, `pier hodor install` to call `make install`, etc.  The `make` command will run on the target machine.
+
+### Listing installed projects
+If you need to get a list of installed projects, you can do so by running `pier` without any additional arguments:
+```ShellSession
+[lightster@local:workspace] $ pier
+Usage:
+  pier PROJECT
+
+Available projects:
+  hodor
+  hub
+  pier-cli
+  ravens
+
+```
