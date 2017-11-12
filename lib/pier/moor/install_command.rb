@@ -12,12 +12,7 @@ module Pier
     end
 
     def run()
-      options, parsed_args = parse_cli_args(@argv)
-
-      repo = parsed_args.shift
-      if repo.to_s.empty? then
-        raise OptionParser::InvalidOption, 'A repo name must be provided'
-      end
+      options, repo = parse_cli_args(@argv)
 
       codebase_dir = @workspace_config.codebase_dir
       clone_dir = @workspace_config.clone_dir
@@ -56,10 +51,6 @@ module Pier
           end
         end if install_commands.is_a?(Array)
       end
-    rescue OptionParser::InvalidOption => exception
-      puts exception.message.capitalize
-      puts
-      puts opt_parser
     end
 
   private
@@ -95,7 +86,17 @@ BANNER
 
       parsed_args = opt_parser.parse(args)
 
-      return options, parsed_args
+      repo = parsed_args.shift
+      if repo.to_s.empty? then
+        raise OptionParser::InvalidOption, 'A repo name must be provided'
+      end
+
+      [options, repo]
+    rescue OptionParser::InvalidOption => exception
+      puts exception.message.capitalize
+      puts
+      puts opt_parser
+      exit 1
     end
   end
 end
