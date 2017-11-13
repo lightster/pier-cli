@@ -26,7 +26,10 @@ module Pier
         config(args)
         exit 0
       elsif command == "docker-compose" then
-        docker_compose(args)
+        proxy_command("docker-compose", args)
+        exit 0
+      elsif command == "docker" then
+        proxy_command("docker",  args)
         exit 0
       elsif command == "map-to-guest-workspace" then
         map_to_guest_workspace(*args)
@@ -46,6 +49,7 @@ Usage:
 
 Available commands:#{cd_command}
   config            Set config option that all projects in workspace will have access to
+  docker            Run a docker command
   docker-compose    Run a docker-compose command on the project found in the current working directory
   install           Install a project
   help              Output this help documentation
@@ -215,16 +219,16 @@ BANNER
     end
   end
 
-  def docker_compose(args)
+  def proxy_command(command, args)
     project_name = @workspace_config.project_name_from_cwd(@cwd)
     codebase_dir = @workspace_config.codebase_dir
     repo_dir = "#{codebase_dir}/#{project_name}"
 
     Dir.chdir(repo_dir) do
-      escaped = args.map do |command|
-        command.shellescape
+      escaped = args.map do |arg|
+        arg.shellescape
       end
-      escaped.unshift("docker-compose")
+      escaped.unshift(command)
 
       runShellProcOrDie(escaped.join(" "))
     end
