@@ -19,7 +19,7 @@ module Pier
       repo_dir = "#{codebase_dir}/#{repo}"
 
       if !Dir.exist?(repo_dir) then
-        runShellProcOrDie %Q(
+        runShellProcOrDie %W(
           git clone git@github.com:#{repo}.git #{clone_dir}/#{repo}
         )
       end

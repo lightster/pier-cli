@@ -5,6 +5,10 @@ require 'pier/version'
 module Pier
   def runShellProc(command)
     begin
+      command = command.map do |arg|
+        arg.shellescape
+      end.join(" ") if command.respond_to?('each')
+
       system(command)
     rescue Interrupt
     end
