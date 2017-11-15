@@ -19,7 +19,7 @@ module Pier
       command = args.shift
 
       if command == "install" then
-        cmd = InstallCommand.new(@cwd, args)
+        cmd = InstallCommand.new(@workspace_config, args)
         cmd.run()
         exit 0
       elsif command == "config" then

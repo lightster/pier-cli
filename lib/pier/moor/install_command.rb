@@ -6,9 +6,9 @@ module Pier
   class InstallCommand
     include ::Pier
 
-    def initialize(cwd, argv)
+    def initialize(workspace_config, argv)
+      @workspace_config = workspace_config
       @argv = Array.new(argv)
-      @workspace_config = WorkspaceConfig.new(cwd)
     end
 
     def run()
