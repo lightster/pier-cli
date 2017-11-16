@@ -57,6 +57,8 @@ HELP
       exit 1
     end
 
+  private
+
     def config(args)
       args = args.dup
       command = args.shift
