@@ -3,7 +3,7 @@ module Pier
     def initialize(options = {})
       @config = {}
 
-      if options.key?(:file) && File.exist?(options[:file]) then
+      if options.key?(:file) && File.exist?(options[:file])
         load_file!(options[:file])
       end
     end
@@ -11,7 +11,7 @@ module Pier
     def get(key)
       current = @config
       parse_key(key).each do |key_part|
-        return nil if !current.key?(key_part)
+        return nil unless current.key?(key_part)
 
         current = current[key_part]
       end
@@ -22,7 +22,7 @@ module Pier
     def has?(key)
       current = @config
       parse_key(key).each do |key_part|
-        return false if !current.key?(key_part)
+        return false unless current.key?(key_part)
 
         current = current[key_part]
       end
@@ -34,34 +34,26 @@ module Pier
 
       keys = parse_key(key)
       keys.each do |key_part|
-        if !current.key?(key_part) then
-          current[key_part] = {}
-        end
+        current[key_part] = {} unless current.key?(key_part)
 
         prev = current
         current = current[key_part]
       end
 
-      if prev then
-        prev[keys.last] = value
-      end
+      prev[keys.last] = value if prev
     end
 
     def load_file!(yaml_file)
-      if File.exist?(yaml_file)
-        @config = YAML.load_file(yaml_file)
-      end
+      @config = YAML.load_file(yaml_file) if File.exist?(yaml_file)
 
-      if !@config.is_a?(Hash) then
-        @config = {}
-      end
+      @config = {} unless @config.is_a?(Hash)
     end
 
     def save_file(yaml_file)
       File.write(yaml_file, @config.to_yaml)
     end
 
-  private
+    private
 
     def parse_key(key)
       parsed_keys = []
@@ -71,6 +63,5 @@ module Pier
 
       parsed_keys
     end
-
   end
 end

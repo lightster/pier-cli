@@ -14,98 +14,98 @@ module Pier
       @cwd = cwd
     end
 
-    def run()
+    def run
       args = @argv.dup
       command = args.shift
 
-      if command == "install" then
+      if command == 'install'
         cmd = InstallCommand.new(@workspace_config, args)
-        cmd.run()
+        cmd.run
         exit 0
-      elsif command == "config" then
+      elsif command == 'config'
         config(args)
         exit 0
-      elsif command == "docker-compose" then
-        proxy_command("docker-compose", args)
+      elsif command == 'docker-compose'
+        proxy_command('docker-compose', args)
         exit 0
-      elsif command == "docker" then
-        proxy_command("docker",  args)
+      elsif command == 'docker'
+        proxy_command('docker', args)
         exit 0
-      elsif command == "map-to-guest-workspace" then
+      elsif command == 'map-to-guest-workspace'
         map_to_guest_workspace(*args)
         exit 0
-      elsif command == "cd-dir" then
+      elsif command == 'cd-dir'
         cd_dir(*args)
         exit 0
       end
 
-      unless ENV['PIER_MOOR_BASH'].to_s.empty? then
+      unless ENV['PIER_MOOR_BASH'].to_s.empty?
         cd_command = "\n  cd                Change directories to the root of a project"
       end
 
-      puts <<HELP
-Usage:
-  moor COMMAND
+      puts <<~HELP
+        Usage:
+          moor COMMAND
 
-Available commands:#{cd_command}
-  config            Set config option that all projects in workspace will have access to
-  docker            Run a docker command
-  docker-compose    Run a docker-compose command on the project found in the current working directory
-  install           Install a project
-  help              Output this help documentation
+        Available commands:#{cd_command}
+          config            Set config option that all projects in workspace will have access to
+          docker            Run a docker command
+          docker-compose    Run a docker-compose command on the project found in the current working directory
+          install           Install a project
+          help              Output this help documentation
 HELP
       exit 1
     end
 
-  private
+    private
 
     def config(args)
       args = args.dup
       command = args.shift
 
       case command
-      when "set" then
+      when 'set' then
         config_set(args)
         exit 0
-      when "get" then
+      when 'get' then
         config_get(args)
         exit 0
       end
 
-      puts <<HELP
-Usage:
-  moor config COMMAND
+      puts <<~HELP
+        Usage:
+          moor config COMMAND
 
-Available commands:
-  set        Set a config option
-  get        Get a config option
+        Available commands:
+          set        Set a config option
+          get        Get a config option
 HELP
       exit 1
     end
 
     def config_set(args)
-      options = {visibility: :unknown, priority: :overrides}
+      options = { visibility: :unknown, priority: :overrides }
 
       opt_parser = OptionParser.new do |opts|
-        opts.banner = <<BANNER
-Usage:
-  moor config set [options] NAME VALUE
+        opts.banner = <<~BANNER
+          Usage:
+            moor config set [options] NAME VALUE
 
-Options:
+          Options:
 BANNER
 
         opts.summary_indent = ''
 
-        opts.on("--workspace", "Set the config option at the workspace level") do
+        opts.on('--workspace', 'Set the config option at the workspace level') do
           options[:visibility] = :workspace
         end
 
-        opts.on("--project PROJECT_NAME", "Set the config option at the project level") do |project_name|
+        opts.on('--project PROJECT_NAME', 'Set the config option at the project level') do |project_name|
           options[:visibility] = :project
           options[:project_name] = project_name
         end
 
-        opts.on("--defaults", "Set the config option in the defaults config instead of the overrides config") do
+        opts.on('--defaults', 'Set the config option in the defaults config instead of the overrides config') do
           options[:priority] = :defaults
         end
       end
@@ -115,7 +115,7 @@ BANNER
       name = parsed_args.shift
       value = parsed_args.shift
 
-      if !name.to_s.empty? && !value.to_s.empty? then
+      if !name.to_s.empty? && !value.to_s.empty?
         case options[:visibility]
         when :workspace then
           @workspace_config.set(name, value, options[:priority])
@@ -139,32 +139,32 @@ BANNER
     end
 
     def config_get(args)
-      options = {visibility: :unknown, priority: :hierarchy}
+      options = { visibility: :unknown, priority: :hierarchy }
 
       opt_parser = OptionParser.new do |opts|
-        opts.banner = <<BANNER
-Usage:
-  moor config get [options] NAME
+        opts.banner = <<~BANNER
+          Usage:
+            moor config get [options] NAME
 
-Options:
+          Options:
 BANNER
 
         opts.summary_indent = ''
 
-        opts.on("--workspace", "Get the config option from the workspace level") do
+        opts.on('--workspace', 'Get the config option from the workspace level') do
           options[:visibility] = :workspace
         end
 
-        opts.on("--project PROJECT_NAME", "Get the config option from the project level") do |project_name|
+        opts.on('--project PROJECT_NAME', 'Get the config option from the project level') do |project_name|
           options[:visibility] = :project
           options[:project_name] = project_name
         end
 
-        opts.on("--defaults", "Get the config option from the defaults config") do
+        opts.on('--defaults', 'Get the config option from the defaults config') do
           options[:priority] = :defaults
         end
 
-        opts.on("--overrides", "Get the config option from the overrides config") do
+        opts.on('--overrides', 'Get the config option from the overrides config') do
           options[:priority] = :overrides
         end
       end
@@ -173,7 +173,7 @@ BANNER
 
       name = parsed_args.shift
 
-      if !name.to_s.empty? then
+      unless name.to_s.empty?
         case options[:visibility]
         when :workspace then
           puts @workspace_config.get_from(name, options[:priority])
@@ -204,11 +204,11 @@ BANNER
     end
   end
 
-  def cd_dir(project = "")
-    if !project.to_s.empty? then
+  def cd_dir(project = '')
+    if !project.to_s.empty?
       project_dir = @workspace_config.project_dir(project)
 
-      if ENV['PIER_HOST_ROOT'] then
+      if ENV['PIER_HOST_ROOT']
         project_dir = project_dir.sub(
           @workspace_config.workspace_root,
           ENV['PIER_HOST_ROOT']
@@ -227,20 +227,16 @@ BANNER
     repo_dir = "#{codebase_dir}/#{project_name}"
 
     Dir.chdir(repo_dir) do
-      escaped = args.map do |arg|
-        arg.shellescape
-      end
+      escaped = args.map(&:shellescape)
       escaped.unshift(command)
 
-      runShellProcOrDie(escaped.join(" "))
+      runShellProcOrDie(escaped.join(' '))
     end
   end
 
-  def map_to_guest_workspace(host_workspace = "", pwd = "")
+  def map_to_guest_workspace(host_workspace = '', pwd = '')
     mapped_dir = pwd.sub(host_workspace, @workspace_config.workspace_root)
-    if mapped_dir == pwd && !File.exist?(mapped_dir) then
-      throw :outside_workspace
-    end
+    throw :outside_workspace if mapped_dir == pwd && !File.exist?(mapped_dir)
     puts mapped_dir
   end
 end

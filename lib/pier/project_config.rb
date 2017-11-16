@@ -8,9 +8,9 @@ module Pier
     end
 
     def get(key)
-      if overrides.has?(key) then
+      if overrides.has?(key)
         overrides.get(key)
-      elsif defaults.has?(key) then
+      elsif defaults.has?(key)
         defaults.get(key)
       elsif @workspace_config.has?(key)
         @workspace_config.get(key)
@@ -20,11 +20,11 @@ module Pier
     end
 
     def get_from(key, priority = nil)
-      if priority == :overrides then
+      if priority == :overrides
         overrides.get(key)
-      elsif priority == :defaults then
+      elsif priority == :defaults
         defaults.get(key)
-      elsif priority == :hierarchy then
+      elsif priority == :hierarchy
         get(key)
       else
         raise ArgumentError, 'priority should be: :overrides, :defaults, :hierarchy'
@@ -32,7 +32,7 @@ module Pier
     end
 
     def set(key, value, priority = :overrides)
-      if priority == :defaults then
+      if priority == :defaults
         defaults.set(key, value)
         defaults.save_file(defaults_yaml)
       else
@@ -41,7 +41,8 @@ module Pier
       end
     end
 
-  private
+    private
+
     def generate_system_defaults
       system_defaults = Config.new
       system_defaults.set('pier.run.command', 'make')
@@ -65,11 +66,11 @@ module Pier
     end
 
     def defaults_yaml
-      File.join(project_dir, ".pier.defaults.yaml")
+      File.join(project_dir, '.pier.defaults.yaml')
     end
 
     def overrides_yaml
-      File.join(project_dir, ".pier.overrides.yaml")
+      File.join(project_dir, '.pier.overrides.yaml')
     end
 
     def project_dir
@@ -81,16 +82,14 @@ module Pier
 
       install_commands.push proc {
         configure_cmd = get('moor.install_options.configure')
-        if File.exist?("#{project_dir}/configure") && configure_cmd then
+        if File.exist?("#{project_dir}/configure") && configure_cmd
           configure_cmd
         end
       }
 
       install_commands.push proc {
         make_cmd = get('moor.install_options.make')
-        if File.exist?("#{project_dir}/Makefile") && make_cmd then
-          make_cmd
-        end
+        make_cmd if File.exist?("#{project_dir}/Makefile") && make_cmd
       }
 
       install_commands
