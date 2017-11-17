@@ -222,11 +222,16 @@ BANNER
   end
 
   def proxy_command(command, args)
-    project_name = @workspace_config.project_name_from_cwd(@cwd)
-    codebase_dir = @workspace_config.codebase_dir
-    repo_dir = "#{codebase_dir}/#{project_name}"
+    cwd = @cwd
 
-    Dir.chdir(repo_dir) do
+    begin
+      project_name = @workspace_config.project_name_from_cwd(@cwd)
+      codebase_dir = @workspace_config.codebase_dir
+      cwd = "#{codebase_dir}/#{project_name}"
+    rescue Error::UndeterminedProjectError
+    end
+
+    Dir.chdir(cwd) do
       escaped = args.map(&:shellescape)
       escaped.unshift(command)
 
