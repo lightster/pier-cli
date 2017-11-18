@@ -235,7 +235,7 @@ BANNER
       escaped = args.map(&:shellescape)
       escaped.unshift(command)
 
-      runShellProcOrDie(escaped.join(' '))
+      run_shell_proc!(escaped.join(' '))
     end
   end
 

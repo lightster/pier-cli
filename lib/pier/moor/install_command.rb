@@ -19,14 +19,14 @@ module Pier
       repo_dir = "#{codebase_dir}/#{repo}"
 
       unless Dir.exist?(repo_dir)
-        runShellProcOrDie %W[
+        run_shell_proc! %W[
           git clone git@github.com:#{repo}.git #{clone_dir}/#{repo}
         ]
       end
 
       branch = options[:branch]
       unless branch.to_s.empty?
-        runShellProcOrDie %(cd #{clone_dir}/#{repo} && git checkout #{branch})
+        run_shell_proc! %(cd #{clone_dir}/#{repo} && git checkout #{branch})
       end
 
       project_config = ProjectConfig.new(repo, @workspace_config)
@@ -45,7 +45,7 @@ module Pier
           install_commands.each do |command|
             command = command.call if command.respond_to?(:call)
 
-            runShellProcOrDie(command) if command
+            run_shell_proc!(command) if command
           end
         end
       end

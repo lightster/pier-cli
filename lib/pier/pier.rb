@@ -40,7 +40,7 @@ HELP
       escaped_args = escaped.join ' '
       full_command = "#{base_command} #{escaped_args}"
 
-      runShellProcOrDie %(cd '#{project_dir}' && #{full_command})
+      run_shell_proc! %(cd '#{project_dir}' && #{full_command})
     rescue Error::UndeterminedProjectError => exception
       STDERR.puts exception.message
       exit 1
