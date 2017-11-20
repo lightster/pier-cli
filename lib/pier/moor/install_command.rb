@@ -54,6 +54,22 @@ module Pier
     private
 
     def parse_cli_args(args)
+      options, remaining_args = parse_cli_options(args)
+
+      repo = remaining_args.shift
+      if repo.to_s.empty?
+        raise OptionParser::InvalidOption, 'A repo name must be provided'
+      end
+
+      [options, repo]
+    rescue OptionParser::InvalidOption => exception
+      puts exception.message.capitalize
+      puts
+      puts opt_parser
+      exit 1
+    end
+
+    def parse_cli_options(args)
       options = { branch: nil, config: {} }
 
       opt_parser = OptionParser.new do |opts|
@@ -82,19 +98,7 @@ BANNER
         end
       end
 
-      parsed_args = opt_parser.parse(args)
-
-      repo = parsed_args.shift
-      if repo.to_s.empty?
-        raise OptionParser::InvalidOption, 'A repo name must be provided'
-      end
-
-      [options, repo]
-    rescue OptionParser::InvalidOption => exception
-      puts exception.message.capitalize
-      puts
-      puts opt_parser
-      exit 1
+      [options, opt_parser.parse(args)]
     end
   end
 end
