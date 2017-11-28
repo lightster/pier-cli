@@ -54,7 +54,7 @@ module Pier
     private
 
     def parse_cli_args(args)
-      options, remaining_args = parse_cli_options(args)
+      options, remaining_args, opt_parser = parse_cli_options(args)
 
       repo = remaining_args.shift
       if repo.to_s.empty?
@@ -98,7 +98,7 @@ BANNER
         end
       end
 
-      [options, opt_parser.parse(args)]
+      [options, opt_parser.parse(args), opt_parser]
     end
   end
 end
