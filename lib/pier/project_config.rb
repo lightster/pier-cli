@@ -80,19 +80,26 @@ module Pier
     def default_install_commands
       install_commands = []
 
-      install_commands.push(proc {
-        configure_cmd = get('moor.install_options.configure')
-        if File.exist?("#{project_dir}/configure") && configure_cmd
-          configure_cmd
-        end
-      })
+      install_commands.push(install_command_generator(
+        'moor.install_options.configure',
+        "#{project_dir}/configure"
+      ))
 
-      install_commands.push(proc {
-        make_cmd = get('moor.install_options.make')
-        make_cmd if File.exist?("#{project_dir}/Makefile") && make_cmd
-      })
+      install_commands.push(install_command_generator(
+        'moor.install_options.make',
+        "#{project_dir}/Makefile"
+      ))
 
       install_commands
+    end
+
+    def install_command_generator(option, required_file)
+      proc {
+        command = get(option)
+        if File.exist?(required_file) && command
+          command
+        end
+      }
     end
   end
 end
