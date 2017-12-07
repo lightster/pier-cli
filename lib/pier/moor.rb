@@ -187,65 +187,65 @@ BANNER
       puts opt_parser
       exit 1
     end
-  end
 
-  def cd_dir(project = '')
-    if !project.to_s.empty?
-      project_dir = @workspace_config.project_dir(project)
+    def cd_dir(project = '')
+      if !project.to_s.empty?
+        project_dir = @workspace_config.project_dir(project)
 
-      if ENV['PIER_HOST_ROOT']
-        project_dir = project_dir.sub(
-          @workspace_config.workspace_root,
-          ENV['PIER_HOST_ROOT']
-        )
+        if ENV['PIER_HOST_ROOT']
+          project_dir = project_dir.sub(
+            @workspace_config.workspace_root,
+            ENV['PIER_HOST_ROOT']
+          )
+        end
+
+        print project_dir
+      else
+        print ENV['PIER_HOST_ROOT'] || @workspace_config.workspace_root
+      end
+    end
+
+    def proxy_command(command, args)
+      cwd = @cwd
+
+      begin
+        project_name = @workspace_config.project_name_from_cwd(@cwd)
+        codebase_dir = @workspace_config.codebase_dir
+        cwd = "#{codebase_dir}/#{project_name}"
+      rescue Error::UndeterminedProjectError
       end
 
-      print project_dir
-    else
-      print ENV['PIER_HOST_ROOT'] || @workspace_config.workspace_root
-    end
-  end
+      Dir.chdir(cwd) do
+        escaped = args.map(&:shellescape)
+        escaped.unshift(command)
 
-  def proxy_command(command, args)
-    cwd = @cwd
-
-    begin
-      project_name = @workspace_config.project_name_from_cwd(@cwd)
-      codebase_dir = @workspace_config.codebase_dir
-      cwd = "#{codebase_dir}/#{project_name}"
-    rescue Error::UndeterminedProjectError
+        run_shell_proc!(escaped.join(' '))
+      end
     end
 
-    Dir.chdir(cwd) do
-      escaped = args.map(&:shellescape)
-      escaped.unshift(command)
-
-      run_shell_proc!(escaped.join(' '))
-    end
-  end
-
-  def map_to_guest_workspace(host_workspace = '', pwd = '')
-    mapped_dir = pwd.sub(host_workspace, @workspace_config.workspace_root)
-    throw :outside_workspace if mapped_dir == pwd && !File.exist?(mapped_dir)
-    puts mapped_dir
-  end
-
-  def help
-    unless ENV['PIER_MOOR_BASH'].to_s.empty?
-      cd_command = "\n  cd                Change directories to the root of a project"
+    def map_to_guest_workspace(host_workspace = '', pwd = '')
+      mapped_dir = pwd.sub(host_workspace, @workspace_config.workspace_root)
+      throw :outside_workspace if mapped_dir == pwd && !File.exist?(mapped_dir)
+      puts mapped_dir
     end
 
-    puts <<~HELP
-      Usage:
-        moor COMMAND
+    def help
+      unless ENV['PIER_MOOR_BASH'].to_s.empty?
+        cd_command = "\n  cd                Change directories to the root of a project"
+      end
 
-      Available commands:#{cd_command}
-        config            Set config option that all projects in workspace will have access to
-        docker            Run a docker command
-        docker-compose    Run a docker-compose command on the project found in the current working directory
-        install           Install a project
-        help              Output this help documentation
-HELP
-    exit 1
+      puts <<~HELP
+        Usage:
+          moor COMMAND
+
+        Available commands:#{cd_command}
+          config            Set config option that all projects in workspace will have access to
+          docker            Run a docker command
+          docker-compose    Run a docker-compose command on the project found in the current working directory
+          install           Install a project
+          help              Output this help documentation
+  HELP
+      exit 1
+    end
   end
 end
