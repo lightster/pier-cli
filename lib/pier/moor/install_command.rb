@@ -79,7 +79,7 @@ module Pier
             moor install [options] REPO_NAME
 
             Options:
-  BANNER
+          BANNER
 
           opts.summary_indent = ''
 
