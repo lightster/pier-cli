@@ -1,5 +1,6 @@
 require 'optparse'
 require 'pier/moor/config_get_command'
+require 'pier/moor/config_set_command'
 require 'pier/moor/install_command'
 require 'pier/project_config'
 require 'pier/workspace_config'
@@ -51,7 +52,8 @@ module Pier
 
       case command
       when 'set' then
-        config_set(args)
+        cmd = ConfigSetCommand.new(@workspace_config, args, @cwd)
+        cmd.run
         exit 0
       when 'get' then
         cmd = ConfigGetCommand.new(@workspace_config, args, @cwd)
@@ -67,61 +69,6 @@ module Pier
           set        Set a config option
           get        Get a config option
 HELP
-      exit 1
-    end
-
-    def config_set(args)
-      options = { visibility: :unknown, priority: :overrides }
-
-      opt_parser = OptionParser.new do |opts|
-        opts.banner = <<~BANNER
-          Usage:
-            moor config set [options] NAME VALUE
-
-          Options:
-BANNER
-
-        opts.summary_indent = ''
-
-        opts.on('--workspace', 'Set the config option at the workspace level') do
-          options[:visibility] = :workspace
-        end
-
-        opts.on('--project PROJECT_NAME', 'Set the config option at the project level') do |project_name|
-          options[:visibility] = :project
-          options[:project_name] = project_name
-        end
-
-        opts.on('--defaults', 'Set the config option in the defaults config instead of the overrides config') do
-          options[:priority] = :defaults
-        end
-      end
-
-      parsed_args = opt_parser.parse(args)
-
-      name = parsed_args.shift
-      value = parsed_args.shift
-
-      if !name.to_s.empty? && !value.to_s.empty?
-        case options[:visibility]
-        when :workspace then
-          @workspace_config.set(name, value, options[:priority])
-          exit 0
-        when :project then
-          project_config = ProjectConfig.new(options[:project_name], @workspace_config)
-          project_config.set(name, value, options[:priority])
-          exit 0
-        end
-
-        raise OptionParser::InvalidOption, '--workspace or --project is required'
-        exit 1
-      end
-    rescue OptionParser::InvalidOption => exception
-      puts exception.message.capitalize
-      puts
-      puts opt_parser
-    else
-      puts opt_parser
       exit 1
     end
 
