@@ -1,6 +1,5 @@
 require 'optparse'
-require 'pier/moor/config_get_command'
-require 'pier/moor/config_set_command'
+require 'pier/moor/config_command'
 require 'pier/moor/install_command'
 require 'pier/project_config'
 require 'pier/workspace_config'
@@ -25,7 +24,8 @@ module Pier
         cmd.run
         exit 0
       elsif command == 'config'
-        config(args)
+        cmd = ConfigCommand.new(@workspace_config, args, @cwd)
+        cmd.run
         exit 0
       elsif command == 'docker-compose'
         proxy_command('docker-compose', args)
@@ -45,32 +45,6 @@ module Pier
     end
 
     private
-
-    def config(args)
-      args = args.dup
-      command = args.shift
-
-      case command
-      when 'set' then
-        cmd = ConfigSetCommand.new(@workspace_config, args, @cwd)
-        cmd.run
-        exit 0
-      when 'get' then
-        cmd = ConfigGetCommand.new(@workspace_config, args, @cwd)
-        cmd.run
-        exit 0
-      end
-
-      puts <<~HELP
-        Usage:
-          moor config COMMAND
-
-        Available commands:
-          set        Set a config option
-          get        Get a config option
-HELP
-      exit 1
-    end
 
     def cd_dir(project = '')
       if !project.to_s.empty?
