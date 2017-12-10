@@ -18,38 +18,14 @@ module Pier
         codebase_dir = @workspace_config.codebase_dir
         clone_dir = @workspace_config.clone_dir
         repo_dir = "#{codebase_dir}/#{repo}"
+        clone_repo_dir = "#{clone_dir}/#{repo}"
 
-        unless Dir.exist?(repo_dir)
-          run_shell_proc! %W[
-            git clone git@github.com:#{repo}.git #{clone_dir}/#{repo}
-          ]
-        end
+        clone_if_missing(repo, clone_repo_dir)
+        checkout_branch(clone_repo_dir, options[:branch])
 
-        branch = options[:branch]
-        unless branch.to_s.empty?
-          run_shell_proc! %(cd #{clone_dir}/#{repo} && git checkout #{branch})
-        end
+        project_config = init_project_config(repo, options[:config])
 
-        project_config = ProjectConfig.new(repo, @workspace_config)
-
-        unless options[:config].empty?
-          options[:config].each_pair do |key, value|
-            project_config.set(key, value, :overrides)
-          end
-        end
-
-        install_commands = project_config.get('moor.install') || []
-        install_commands = install_commands.values if install_commands.is_a?(Hash)
-
-        Dir.chdir(repo_dir) do
-          if install_commands.is_a?(Array)
-            install_commands.each do |command|
-              command = command.call if command.respond_to?(:call)
-
-              run_shell_proc!(command) if command
-            end
-          end
-        end
+        run_install_commands(repo_dir, project_config)
       end
 
       private
@@ -100,6 +76,47 @@ module Pier
         end
 
         [options, opt_parser.parse(args), opt_parser]
+      end
+
+      def clone_if_missing(repo, clone_repo_dir)
+        return if Dir.exist?(clone_repo_dir)
+
+        run_shell_proc! %W[
+          git clone git@github.com:#{repo}.git #{clone_repo_dir}
+        ]
+      end
+
+      def checkout_branch(clone_repo_dir, branch)
+        return if branch.to_s.empty?
+
+        run_shell_proc! %(cd #{clone_repo_dir} && git checkout #{branch})
+      end
+
+      def init_project_config(repo, config)
+        project_config = ProjectConfig.new(repo, @workspace_config)
+
+        unless config.empty?
+          config.each_pair do |key, value|
+            project_config.set(key, value, :overrides)
+          end
+        end
+
+        return project_config
+      end
+
+      def run_install_commands(repo_dir, project_config)
+        install_commands = project_config.get('moor.install') || []
+        install_commands = install_commands.values if install_commands.is_a?(Hash)
+
+        Dir.chdir(repo_dir) do
+          if install_commands.is_a?(Array)
+            install_commands.each do |command|
+              command = command.call if command.respond_to?(:call)
+
+              run_shell_proc!(command) if command
+            end
+          end
+        end
       end
     end
   end
