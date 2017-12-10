@@ -105,17 +105,26 @@ module Pier
       end
 
       def run_install_commands(repo_dir, project_config)
-        install_commands = project_config.get('moor.install') || []
-        install_commands = install_commands.values if install_commands.is_a?(Hash)
+        install_commands = install_commands(project_config)
 
         Dir.chdir(repo_dir) do
-          if install_commands.is_a?(Array)
-            install_commands.each do |command|
-              command = command.call if command.respond_to?(:call)
+          install_commands.each do |command|
+            command = command.call if command.respond_to?(:call)
 
-              run_shell_proc!(command) if command
-            end
+            run_shell_proc!(command) if command
           end
+        end
+      end
+
+      def install_commands(project_config)
+        install_commands = project_config.get('moor.install') || []
+
+        if install_commands.respond_to?(:values)
+          install_commands.values
+        elsif install_commands.respond_to?(:each)
+          install_commands
+        else
+          []
         end
       end
     end
