@@ -30,21 +30,11 @@ module Pier
       private
 
       def parse_cli_args(args)
-        options, remaining_args, opt_parser = parse_cli_options(args)
+        options, opt_parser = parse_cli_options(args)
 
-        name = remaining_args.shift
-        value = remaining_args.shift
+        check_options(options)
 
-        if name.to_s.empty? || value.to_s.empty?
-          raise OptionParser::MissingArgument
-        end
-
-        if options[:visibility] === :unknown
-          raise OptionParser::InvalidOption, '--workspace or --project is required'
-          exit 1
-        end
-
-        [options, name, value]
+        [options, options[:name], options[:value]]
       rescue OptionParser::InvalidOption => exception
         puts exception.message.capitalize
         puts
@@ -82,7 +72,21 @@ module Pier
           end
         end
 
-        [options, opt_parser.parse(args), opt_parser]
+        remaining_args = opt_parser.parse(args)
+        options[:name] = remaining_args.shift
+        options[:value] = remaining_args.shift
+
+        [options, opt_parser]
+      end
+
+      def check_options(options)
+        if options[:name].to_s.empty? || options[:value].to_s.empty?
+          raise OptionParser::MissingArgument
+        end
+
+        if options[:visibility] === :unknown
+          raise OptionParser::InvalidOption, '--workspace or --project is required'
+        end
       end
     end
   end
