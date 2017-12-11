@@ -109,11 +109,15 @@ module Pier
 
         Dir.chdir(repo_dir) do
           install_commands.each do |command|
-            command = command.call if command.respond_to?(:call)
-
-            run_shell_proc!(command) if command
+            run_install_command(command)
           end
         end
+      end
+
+      def run_install_command(command)
+        command = command.call if command.respond_to?(:call)
+
+        run_shell_proc!(command) if command
       end
 
       def install_commands(project_config)
