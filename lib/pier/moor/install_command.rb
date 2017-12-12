@@ -1,11 +1,12 @@
 require 'optparse'
+require 'pier/command'
 require 'pier/project_config'
 require 'pier/workspace_config'
 
 module Pier
   class Moor
     class InstallCommand
-      include ::Pier
+      include Command
 
       def initialize(workspace_config, argv)
         @workspace_config = workspace_config

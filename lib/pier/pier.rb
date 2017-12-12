@@ -1,8 +1,9 @@
 require 'shellwords'
+require 'pier/command'
 
 module Pier
   class Pier
-    include ::Pier
+    include Command
 
     def initialize(cwd, argv)
       @argv = Array.new(argv)

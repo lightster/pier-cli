@@ -5,8 +5,6 @@ require 'pier/moor/config_set_command'
 module Pier
   class Moor
     class ConfigCommand
-      include ::Pier
-
       def initialize(workspace_config, argv, cwd)
         @workspace_config = workspace_config
         @argv = Array.new(argv)

@@ -1,4 +1,5 @@
 require 'optparse'
+require 'pier/command'
 require 'pier/moor/config_command'
 require 'pier/moor/install_command'
 require 'pier/project_config'
@@ -7,7 +8,7 @@ require 'shellwords'
 
 module Pier
   class Moor
-    include ::Pier
+    include Command
 
     def initialize(cwd, argv)
       @argv = Array.new(argv)
