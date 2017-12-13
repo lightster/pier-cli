@@ -2,6 +2,7 @@ require 'optparse'
 require 'pier/command'
 require 'pier/moor/config_command'
 require 'pier/moor/install_command'
+require 'pier/moor/proxy_command'
 require 'pier/project_config'
 require 'pier/workspace_config'
 require 'shellwords'
@@ -29,10 +30,12 @@ module Pier
         cmd.run
         exit 0
       elsif command == 'docker-compose'
-        proxy_command('docker-compose', args)
+        cmd = ProxyCommand.new('docker-compose', @workspace_config, args, @cwd)
+        cmd.run
         exit 0
       elsif command == 'docker'
-        proxy_command('docker', args)
+        cmd = ProxyCommand.new('docker', @workspace_config, args, @cwd)
+        cmd.run
         exit 0
       elsif command == 'map-to-guest-workspace'
         map_to_guest_workspace(*args)
@@ -61,24 +64,6 @@ module Pier
         print project_dir
       else
         print ENV['PIER_HOST_ROOT'] || @workspace_config.workspace_root
-      end
-    end
-
-    def proxy_command(command, args)
-      cwd = @cwd
-
-      begin
-        project_name = @workspace_config.project_name_from_cwd(@cwd)
-        codebase_dir = @workspace_config.codebase_dir
-        cwd = "#{codebase_dir}/#{project_name}"
-      rescue Error::UndeterminedProjectError
-      end
-
-      Dir.chdir(cwd) do
-        escaped = args.map(&:shellescape)
-        escaped.unshift(command)
-
-        run_shell_proc!(escaped.join(' '))
       end
     end
 
