@@ -2,6 +2,7 @@ require 'optparse'
 require 'pier/command'
 require 'pier/moor/config_command'
 require 'pier/moor/install_command'
+require 'pier/moor/map_to_guest_workspace_command'
 require 'pier/moor/proxy_command'
 require 'pier/project_config'
 require 'pier/workspace_config'
@@ -38,7 +39,8 @@ module Pier
         cmd.run
         exit 0
       elsif command == 'map-to-guest-workspace'
-        map_to_guest_workspace(*args)
+        cmd = MapToGuestWorkspaceCommand.new(@workspace_config, args)
+        cmd.run
         exit 0
       elsif command == 'cd-dir'
         cd_dir(*args)
@@ -65,12 +67,6 @@ module Pier
       else
         print ENV['PIER_HOST_ROOT'] || @workspace_config.workspace_root
       end
-    end
-
-    def map_to_guest_workspace(host_workspace = '', pwd = '')
-      mapped_dir = pwd.sub(host_workspace, @workspace_config.workspace_root)
-      throw :outside_workspace if mapped_dir == pwd && !File.exist?(mapped_dir)
-      puts mapped_dir
     end
 
     def help
