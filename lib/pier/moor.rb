@@ -84,7 +84,7 @@ module Pier
           docker-compose    Run a docker-compose command on the project found in the current working directory
           install           Install a project
           help              Output this help documentation
-  HELP
+      HELP
       exit 1
     end
   end
