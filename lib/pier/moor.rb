@@ -1,6 +1,7 @@
 require 'optparse'
 require 'pier/command'
 require 'pier/moor/config_command'
+require 'pier/moor/help_command'
 require 'pier/moor/install_command'
 require 'pier/moor/map_to_guest_workspace_command'
 require 'pier/moor/proxy_command'
@@ -47,7 +48,8 @@ module Pier
         exit 0
       end
 
-      help
+      cmd = HelpCommand.new
+      cmd.run
     end
 
     private
@@ -67,25 +69,6 @@ module Pier
       else
         print ENV['PIER_HOST_ROOT'] || @workspace_config.workspace_root
       end
-    end
-
-    def help
-      unless ENV['PIER_MOOR_BASH'].to_s.empty?
-        cd_command = "\n  cd                Change directories to the root of a project"
-      end
-
-      puts <<~HELP
-        Usage:
-          moor COMMAND
-
-        Available commands:#{cd_command}
-          config            Set config option that all projects in workspace will have access to
-          docker            Run a docker command
-          docker-compose    Run a docker-compose command on the project found in the current working directory
-          install           Install a project
-          help              Output this help documentation
-      HELP
-      exit 1
     end
   end
 end
