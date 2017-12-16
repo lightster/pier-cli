@@ -1,5 +1,6 @@
 require 'optparse'
 require 'pier/command'
+require 'pier/moor/cd_dir_command'
 require 'pier/moor/config_command'
 require 'pier/moor/help_command'
 require 'pier/moor/install_command'
@@ -44,7 +45,8 @@ module Pier
         cmd.run
         exit 0
       elsif command == 'cd-dir'
-        cd_dir(*args)
+        cmd = CdDirCommand.new(@workspace_config, args, @cwd)
+        cmd.run
         exit 0
       end
 
