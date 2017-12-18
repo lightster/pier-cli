@@ -53,24 +53,5 @@ module Pier
       cmd = HelpCommand.new
       cmd.run
     end
-
-    private
-
-    def cd_dir(project = '')
-      if !project.to_s.empty?
-        project_dir = @workspace_config.project_dir(project)
-
-        if ENV['PIER_HOST_ROOT']
-          project_dir = project_dir.sub(
-            @workspace_config.workspace_root,
-            ENV['PIER_HOST_ROOT']
-          )
-        end
-
-        print project_dir
-      else
-        print ENV['PIER_HOST_ROOT'] || @workspace_config.workspace_root
-      end
-    end
   end
 end
