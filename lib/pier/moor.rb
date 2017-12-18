@@ -24,33 +24,33 @@ module Pier
       args = @argv.dup
       command = args.shift
 
-      if command == 'install'
-        cmd = InstallCommand.new(@workspace_config, args)
-        cmd.run
-        exit 0
-      elsif command == 'config'
-        cmd = ConfigCommand.new(@workspace_config, args, @cwd)
-        cmd.run
-        exit 0
-      elsif command == 'docker-compose'
-        cmd = ProxyCommand.new('docker-compose', @workspace_config, args, @cwd)
-        cmd.run
-        exit 0
-      elsif command == 'docker'
-        cmd = ProxyCommand.new('docker', @workspace_config, args, @cwd)
-        cmd.run
-        exit 0
-      elsif command == 'map-to-guest-workspace'
-        cmd = MapToGuestWorkspaceCommand.new(@workspace_config, args)
-        cmd.run
-        exit 0
-      elsif command == 'cd-dir'
-        cmd = CdDirCommand.new(@workspace_config, args, @cwd)
-        cmd.run
-        exit 0
-      end
+      commands = {
+        "install": lambda {
+          return InstallCommand.new(@workspace_config, args)
+        },
+        "config": lambda {
+          return ConfigCommand.new(@workspace_config, args, @cwd)
+        },
+        "docker-compose": lambda {
+          return ProxyCommand.new('docker-compose', @workspace_config, args, @cwd)
+        },
+        "docker": lambda {
+          return ProxyCommand.new('docker', @workspace_config, args, @cwd)
+        },
+        "map-to-guest-workspace": lambda {
+          return MapToGuestWorkspaceCommand.new(@workspace_config, args)
+        },
+        "cd-dir": lambda {
+          return CdDirCommand.new(@workspace_config, args, @cwd)
+        },
+        "help": lambda {
+          HelpCommand.new
+        },
+      }
 
-      cmd = HelpCommand.new
+      command = :help if !command || !commands.key?(command.to_sym)
+
+      cmd = commands[command.to_sym].call
       cmd.run
     end
   end
