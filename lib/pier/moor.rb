@@ -48,7 +48,12 @@ module Pier
         },
       }
 
-      command = :help if !command || !commands.key?(command.to_sym)
+      if command && !commands.key?(command.to_sym)
+        puts "Invalid command: #{command}"
+        command = "help"
+      end
+
+      command = :help if !command
 
       cmd = commands[command.to_sym].call
       cmd.run
